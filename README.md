@@ -8,8 +8,8 @@ npm i ts-node -g
 ```
 
 ```
-git clone https://github.com/siteslave/ts-node-express myApi
-cd myApi
+git clone https://github.com/mophos/mymoph-api.git mymoph-api
+cd mymoph-api
 npm i
 ```
 
