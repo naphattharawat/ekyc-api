@@ -36,7 +36,7 @@ export class RegisterModel {
         if (error) {
           reject(error)
         } else {
-          resolve(body);
+           resolve(JSON.parse(body));
         }
       });
     });
