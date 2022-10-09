@@ -40,10 +40,18 @@ router.post('/qr', async (req: Request, res: Response) => {
     let refreshToken: string = req.body.refreshToken;
     let accessToken: string = req.body.accessToken;
     let sessionId: string = req.body.sessionId;
+    console.log(req.body);
+    
     let rs: any = await loginModel.loginQR(clientId, sessionId, refreshToken, accessToken);
     console.log(rs);
     if (rs) {
-      res.send(rs);
+      if(rs.message == "OK"){
+        rs.ok = true;
+        res.send(rs);
+      }else{
+        rs.ok = false;
+        res.send(rs);
+      }
     } else {
       res.status(401)
       res.send({ ok: false, error: rs.error, message: rs.message });
@@ -60,6 +68,7 @@ router.post('/token', async (req: Request, res: Response) => {
     let rs: any = await loginModel.refreshToken(refreshToken);
 
     if (rs.access_token) {
+      rs.ok = true;
       res.send(rs);
     } else {
       res.status(401)

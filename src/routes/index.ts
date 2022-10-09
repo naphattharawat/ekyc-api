@@ -20,6 +20,22 @@ router.post('/', (req: Request, res: Response) => {
   res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
 });
 
+router.get('/testmq', (req: Request, res: Response) => {
+  console.log(req.body);
+  console.log(req.body.session_id);
+  
+  
+  res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
+});
+
+router.post('/testmq', (req: Request, res: Response) => {
+  console.log(req.body);
+  console.log(req.body.session_id);
+  
+  
+  res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
+});
+
 router.get('/gen-token', async (req: Request, res: Response) => {
 
   try {
