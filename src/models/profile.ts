@@ -1,11 +1,11 @@
 const request = require('request');
 
-export class LoginModel {
+export class ProfileModel {
 
   getProfile(token: String) {
 
     const options = {
-      method: 'POST',
+      method: 'GET',
       url: 'https://members.moph.go.th/api/v1/m/user',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

@@ -5,20 +5,19 @@ import { Router, Request, Response } from 'express';
 import * as HttpStatus from 'http-status-codes';
 import * as crypto from 'crypto';
 
-import { LoginModel } from '../models/login';
+import { ProfileModel } from '../models/profile';
 
 import { Jwt } from '../models/jwt';
 
-const loginModel = new LoginModel();
+const profileModel = new ProfileModel();
 const jwt = new Jwt();
 
 const router: Router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    let username: string = req.body.username;
-    let password: string = req.body.password;
-    let rs: any = await loginModel.login(username, password);
+    let oauthToken: string = req.query.oauth_access_token;
+    let rs: any = await profileModel.getProfile(oauthToken);
     console.log(rs);
     if (rs.cid) {
       res.send(rs);

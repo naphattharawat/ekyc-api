@@ -18,6 +18,8 @@ import { Jwt } from './models/jwt';
 
 import indexRoute from './routes/index';
 import loginRoute from './routes/login';
+import devicesRoute from './routes/device';
+import profilesRoute from './routes/profile';
 import registerRoute from './routes/register';
 
 // Assign router to the express.Router() instance
@@ -47,7 +49,7 @@ let connection: MySqlConnectionConfig = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   multipleStatements: true,
-  debug: true
+  debug: false
 }
 
 let db = Knex({
@@ -94,6 +96,8 @@ let checkAuth = (req: Request, res: Response, next: NextFunction) => {
 }
 
 app.use('/login', loginRoute);
+app.use('/devices', checkAuth, devicesRoute);
+app.use('/profiles', checkAuth, profilesRoute);
 app.use('/register', registerRoute);
 app.use('/', indexRoute);
 

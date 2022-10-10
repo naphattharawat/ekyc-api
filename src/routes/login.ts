@@ -1,3 +1,4 @@
+import { DeviceModel } from './../models/devices';
 /// <reference path="../../typings.d.ts" />
 
 import * as express from 'express';
@@ -9,6 +10,7 @@ import { LoginModel } from '../models/login';
 
 import { Jwt } from '../models/jwt';
 
+const deviceModel = new DeviceModel();
 const loginModel = new LoginModel();
 const jwt = new Jwt();
 
@@ -18,11 +20,26 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     let username: string = req.body.username;
     let password: string = req.body.password;
+    let deviceInfo: any = req.body.deviceInfo;
+    let data: any = {};
     let rs: any = await loginModel.login(username, password);
-    console.log(rs);
-
     if (rs.access_token) {
-      res.send(rs);
+      data.oauth = rs;
+      if (deviceInfo.deviceId) {
+        const obj: any = {
+          device_id: deviceInfo.deviceId,
+          fcm_token: deviceInfo.fcmToken,
+          system_name: deviceInfo.systemName,
+          version: deviceInfo.version,
+          model: deviceInfo.model,
+          model_version: deviceInfo.modelVersion
+        }
+        await deviceModel.saveDevice(req.db, obj);
+        let token: any = obj;
+        data.token = jwt.signNoExp(token);
+        data.ok = true;
+        res.send(data);
+      }
     } else {
       res.status(401)
       res.send({ ok: false, error: rs.error, message: rs.message });
@@ -41,14 +58,14 @@ router.post('/qr', async (req: Request, res: Response) => {
     let accessToken: string = req.body.accessToken;
     let sessionId: string = req.body.sessionId;
     console.log(req.body);
-    
+
     let rs: any = await loginModel.loginQR(clientId, sessionId, refreshToken, accessToken);
     console.log(rs);
     if (rs) {
-      if(rs.message == "OK"){
+      if (rs.message == "OK") {
         rs.ok = true;
         res.send(rs);
-      }else{
+      } else {
         rs.ok = false;
         res.send(rs);
       }
