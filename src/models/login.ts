@@ -6,7 +6,7 @@ export class LoginModel {
 
     const options = {
       method: 'POST',
-      url: 'https://members.moph.go.th/api/v2/oauth/token',
+      url: 'https://members.moph.go.th/api/v1/m/oauth/token',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       form: {
         client_id: process.env.mymoph_clientId,
@@ -55,7 +55,7 @@ export class LoginModel {
 
     const options = {
       method: 'POST',
-      url: 'https://members.moph.go.th/api/v2/oauth/refresh_token',
+      url: 'https://members.moph.go.th/api/v1/m/oauth/refresh_token',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       form: {
         client_id: 'nNzKqHtSXlQRYVujulAu',
