@@ -73,4 +73,10 @@ export class LoginModel {
       });
     });
   }
+
+  saveLog(db, deviceId) {
+    return db('logs_login').insert({
+      device_id: deviceId
+    })
+  }
 }

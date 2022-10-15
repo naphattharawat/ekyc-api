@@ -49,6 +49,12 @@ router.post('/', async (req: Request, res: Response) => {
         email: email
       }
       const rs: any = await registerModel.register(obj);
+      await registerModel.saveUser(req.db, {
+        cid,
+        first_name: firstName,
+        last_name: lastName,
+        email
+      });
       console.log(rs);
 
       if (rs.ok) {

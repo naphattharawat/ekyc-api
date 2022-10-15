@@ -97,4 +97,8 @@ export class RegisterModel {
 
   }
 
+  saveUser(db, data) {
+    return db('users').insert(data);
+  }
+
 }
