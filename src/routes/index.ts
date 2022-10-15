@@ -12,6 +12,10 @@ router.get('/', (req: Request, res: Response) => {
   res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
 });
 
+router.get('/privacy', (req: Request, res: Response) => {
+  res.render('privacy');
+});
+
 router.post('/', (req: Request, res: Response) => {
   console.log(req.body);
   console.log(req.body.session_id);
