@@ -16,8 +16,8 @@ const router: Router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    let oauthToken: string = req.query.oauth_access_token;
-    let rs: any = await profileModel.getProfile(oauthToken);
+    let accessToken: string = req.query.accessToken;
+    let rs: any = await profileModel.getProfile(accessToken);
     console.log(rs);
     if (rs.cid) {
       res.send(rs);
