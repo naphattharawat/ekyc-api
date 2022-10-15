@@ -5,7 +5,7 @@ export class PaySlipModel {
     getSlip(accessToken) {
 
         const options = {
-            method: 'POST',
+            method: 'GET',
             url: 'https://payslip-ops.moph.go.th/api/v1/m/user/slip',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -25,7 +25,7 @@ export class PaySlipModel {
 
     getSlips(accessToken) {
         const options = {
-            method: 'POST',
+            method: 'GET',
             url: 'https://payslip-ops.moph.go.th/api/v1/m/user/slips',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
