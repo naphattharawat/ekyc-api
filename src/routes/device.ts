@@ -20,6 +20,7 @@ router.post('/', async (req: Request, res: Response) => {
     if (body.deviceId) {
       const obj: any = {
         device_id: body.deviceId,
+        cid: body.cid,
         fcm_token: body.fcmToken,
         system_name: body.systemName,
         version: body.version,

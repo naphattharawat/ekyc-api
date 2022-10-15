@@ -3,13 +3,17 @@ const fs = require('fs');
 export class RegisterModel {
 
   register(data) {
-
     const options = {
       method: 'POST',
-      url: 'https://members.moph.go.th/api/v2/oauth/token',
+      url: 'https://members.moph.go.th/api/v1/m/register',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       form: {
-        client_id: process.env.mymoph_clientId
+        cid: data.cid,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        password: data.password,
+        email: data.email,
+        session_id: data.session_id
       }
     };
     return new Promise<void>((resolve, reject) => {
@@ -36,7 +40,7 @@ export class RegisterModel {
         if (error) {
           reject(error)
         } else {
-           resolve(JSON.parse(body));
+          resolve(JSON.parse(body));
         }
       });
     });

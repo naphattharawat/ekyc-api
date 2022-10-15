@@ -36,16 +36,17 @@ router.post('/', async (req: Request, res: Response) => {
     let cid = req.body.cid;
     let firstName = req.body.firstName;
     let lastName = req.body.lastName;
-    let birthday = req.body.birthday;
-    let laser = req.body.laser;
+    let password = req.body.password;
+    let email = req.body.email;
     let sessionId = req.body.sessionId;
-    if (cid && firstName && lastName && moment(birthday, 'YYYY-MM-DD').isValid() && laser) {
+    if (cid && firstName && lastName && password && sessionId && email) {
       const obj: any = {
         cid: cid,
-        firstName: firstName,
-        lastName: lastName,
-        birthday: birthday,
-        laser: laser
+        first_name: firstName,
+        last_name: lastName,
+        password: password,
+        session_id: sessionId,
+        email: email
       }
       const rs: any = await registerModel.register(obj);
       console.log(rs);
