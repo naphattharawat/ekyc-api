@@ -20,6 +20,7 @@ import indexRoute from './routes/index';
 import loginRoute from './routes/login';
 import devicesRoute from './routes/device';
 import profilesRoute from './routes/profile';
+import payslipRoute from './routes/payslip';
 import registerRoute from './routes/register';
 
 // Assign router to the express.Router() instance
@@ -98,6 +99,7 @@ let checkAuth = (req: Request, res: Response, next: NextFunction) => {
 app.use('/login', loginRoute);
 app.use('/devices', checkAuth, devicesRoute);
 app.use('/profiles', checkAuth, profilesRoute);
+app.use('/payslips', checkAuth, payslipRoute);
 app.use('/register', registerRoute);
 app.use('/', indexRoute);
 
