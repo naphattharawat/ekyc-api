@@ -74,9 +74,9 @@ export class LoginModel {
     });
   }
 
-  saveLog(db, deviceId) {
+  saveLog(db, deviceId, type) {
     return db('logs_login').insert({
-      device_id: deviceId
+      device_id: deviceId, type
     })
   }
 }

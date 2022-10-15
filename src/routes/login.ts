@@ -36,10 +36,12 @@ router.post('/', async (req: Request, res: Response) => {
           model_version: deviceInfo.modelVersion
         }
         await deviceModel.saveDevice(req.db, obj);
-        await loginModel.saveLog(req.db, deviceInfo.deviceId);
-        let token: any = obj;
-        delete token.cid;
-        data.token = jwt.signNoExp(token);
+        await loginModel.saveLog(req.db, deviceInfo.deviceId, 'LONG_LOGIN');
+        let token: any = {
+          device_id: deviceInfo.deviceId,
+          cid: rs.cid
+        }
+        data.token = jwt.sign(token);
         data.ok = true;
         res.send(data);
       }

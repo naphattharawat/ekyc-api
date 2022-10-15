@@ -18,6 +18,7 @@ import { Jwt } from './models/jwt';
 
 import indexRoute from './routes/index';
 import loginRoute from './routes/login';
+import loginAuthRoute from './routes/login_auth';
 import devicesRoute from './routes/device';
 import profilesRoute from './routes/profile';
 import payslipRoute from './routes/payslip';
@@ -97,6 +98,7 @@ let checkAuth = (req: Request, res: Response, next: NextFunction) => {
 }
 
 app.use('/login', loginRoute);
+app.use('/login/bio', checkAuth, loginAuthRoute);
 app.use('/devices', checkAuth, devicesRoute);
 app.use('/profiles', checkAuth, profilesRoute);
 app.use('/payslips', checkAuth, payslipRoute);
