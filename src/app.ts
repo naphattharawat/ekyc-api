@@ -98,7 +98,7 @@ let checkAuth = (req: Request, res: Response, next: NextFunction) => {
 }
 
 app.use('/login', loginRoute);
-app.use('/login/bio', checkAuth, loginAuthRoute);
+app.use('/login/bio', loginAuthRoute);
 app.use('/devices', checkAuth, devicesRoute);
 app.use('/profiles', checkAuth, profilesRoute);
 app.use('/payslips', checkAuth, payslipRoute);
