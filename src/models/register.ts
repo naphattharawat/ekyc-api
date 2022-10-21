@@ -123,6 +123,27 @@ export class RegisterModel {
     })
 
   }
+  ekycInfoBeforeComplete(sessionId) {
+    const key = process.env.ekyc_appId;
+    const options = {
+      method: 'GET',
+      url: `https://rmsservice.moph.go.th/MobileIdService/api/v2/Sessions/${sessionId}/IdCard`,
+      headers: {
+        apiKey: key,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    };
+    return new Promise<void>((resolve, reject) => {
+      request(options, function (error, response, body) {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(JSON.parse(body));
+        }
+      });
+    })
+
+  }
 
   saveUser(db, data) {
     return db('users').insert(data);

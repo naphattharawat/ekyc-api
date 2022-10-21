@@ -233,6 +233,8 @@ router.post('/ekyc/complete', async (req: Request, res: Response) => {
   try {
     const sessionId = req.body.sessionId;
     const rs: any = await registerModel.ekycComplete(sessionId)
+    const info: any = await registerModel.ekycInfoBeforeComplete(sessionId);
+    rs.info = info;
     res.send(rs);
   } catch (error) {
     res.status(HttpStatus.BAD_GATEWAY);
