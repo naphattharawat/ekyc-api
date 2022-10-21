@@ -182,7 +182,10 @@ router.post('/ekyc/front', upload.any(), async (req: Request, res: Response) => 
     if (req.files.length) {
       const filePath = req.files[0].path || null;
       const rs: any = await registerModel.ekycFace(sessionId, filePath, 'idcard')
-      console.log(rs);
+      if (rs.message == 'ไม่สามารถอ่าน ID Card ได้ กรุณาตรวจสอบรูปภาพ') {
+        const newPath = path.join(uploadDir, 'front-error', req.files[0].name);
+        await fs.renameSync(filePath, newPath);
+      }
 
       res.send({ ok: true, message: rs.message })
     } else {
@@ -200,6 +203,10 @@ router.post('/ekyc/back', upload.any(), async (req: Request, res: Response) => {
     if (req.files.length) {
       const filePath = req.files[0].path || null;
       const rs: any = await registerModel.ekycFace(sessionId, filePath, 'back')
+      if (rs.message == 'ไม่สามารถอ่าน ID Card ได้ กรุณาตรวจสอบรูปภาพ') {
+        const newPath = path.join(uploadDir, 'back-error', req.files[0].name);
+        await fs.renameSync(filePath, newPath);
+      }
       res.send({ ok: true, message: rs.message })
     } else {
       res.send({ ok: false })
