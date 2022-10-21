@@ -50,7 +50,7 @@ router.post('/', async (req: Request, res: Response) => {
       if (rs.ok) {
         res.send({ ok: true, code: HttpStatus.OK });
       } else {
-        res.send({ ok: true, error: rs.error, error_description: rs.error_description });
+        res.send({ ok: false, error: rs.error, error_description: rs.error_description });
       }
     } else {
       res.status(HttpStatus.BAD_REQUEST);
@@ -88,7 +88,7 @@ router.post('/verify-kyc', async (req: Request, res: Response) => {
       if (rs.ok) {
         res.send({ ok: true, code: HttpStatus.OK });
       } else {
-        res.send({ ok: true, error: rs.error, error_description: rs.error_description });
+        res.send({ ok: false, error: rs.error, error_description: rs.error_description });
       }
     } else {
       res.status(HttpStatus.BAD_REQUEST);
