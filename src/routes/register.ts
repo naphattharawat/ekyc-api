@@ -203,8 +203,12 @@ router.post('/ekyc/back', upload.any(), async (req: Request, res: Response) => {
     if (req.files.length) {
       const filePath = req.files[0].path || null;
       const rs: any = await registerModel.ekycFace(sessionId, filePath, 'back')
+      console.log(req.files[0]);
       if (rs.message == 'ไม่สามารถอ่าน ID Card ได้ กรุณาตรวจสอบรูปภาพ') {
+        
         const newPath = path.join(uploadDir, 'back-error', req.files[0].name);
+        console.log(filePath, newPath);
+
         await fs.renameSync(filePath, newPath);
       }
       res.send({ ok: true, message: rs.message })
