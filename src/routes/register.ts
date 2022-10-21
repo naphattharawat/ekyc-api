@@ -183,7 +183,8 @@ router.post('/ekyc/front', upload.any(), async (req: Request, res: Response) => 
       const filePath = req.files[0].path || null;
       const rs: any = await registerModel.ekycFace(sessionId, filePath, 'idcard')
       if (rs.message == 'ไม่สามารถอ่าน ID Card ได้ กรุณาตรวจสอบรูปภาพ') {
-        const newPath = path.join(uploadDir, 'front-error', req.files[0].name);
+        const newPath = path.join(uploadDir, 'front-error', sessionId + path.extname(req.files[0].originalname));
+        console.log(filePath, newPath);
         await fs.renameSync(filePath, newPath);
       }
 
@@ -203,14 +204,21 @@ router.post('/ekyc/back', upload.any(), async (req: Request, res: Response) => {
     if (req.files.length) {
       const filePath = req.files[0].path || null;
       const rs: any = await registerModel.ekycFace(sessionId, filePath, 'back')
-      console.log(req.files[0]);
       if (rs.message == 'ไม่สามารถอ่าน ID Card ได้ กรุณาตรวจสอบรูปภาพ') {
-        
-        const newPath = path.join(uploadDir, 'back-error', req.files[0].name);
+        const newPath = path.join(uploadDir, 'back-error', sessionId + path.extname(req.files[0].originalname));
         console.log(filePath, newPath);
-
         await fs.renameSync(filePath, newPath);
       }
+      // 0|api  | {
+      //   0|api  |   fieldname: 'image',
+      //   0|api  |   originalname: 'back.png',
+      //   0|api  |   encoding: '7bit',
+      //   0|api  |   mimetype: 'application/octet-stream',
+      //   0|api  |   destination: './uploads',
+      //   0|api  |   filename: '1666328908666.png',
+      //   0|api  |   path: 'uploads/1666328908666.png',
+      //   0|api  |   size: 283310
+      //   0|api  | }
       res.send({ ok: true, message: rs.message })
     } else {
       res.send({ ok: false })
