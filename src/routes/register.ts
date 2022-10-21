@@ -67,6 +67,7 @@ router.post('/', async (req: Request, res: Response) => {
 // // save new request
 router.post('/verify-kyc', async (req: Request, res: Response) => {
   try {
+    let accessToken = req.body.accessToken;
     let cid = req.body.cid;
     let firstName = req.body.firstName;
     let lastName = req.body.lastName;
@@ -78,7 +79,7 @@ router.post('/verify-kyc', async (req: Request, res: Response) => {
         last_name: lastName,
         session_id: sessionId
       }
-      const rs: any = await registerModel.verifyKyc(obj);
+      const rs: any = await registerModel.verifyKyc(accessToken, obj);
       await registerModel.updateUser(req.db, cid, {
         first_name: firstName,
         last_name: lastName

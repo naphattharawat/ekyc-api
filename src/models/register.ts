@@ -28,16 +28,18 @@ export class RegisterModel {
     });
   }
 
-  verifyKyc(data) {
+  verifyKyc(accessToken, data) {
     const options = {
       method: 'POST',
-      url: 'https://members.moph.go.th/api/v1/m/register/kyc',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      url: 'https://members.moph.go.th/api/v1/m/is_kyc',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Bearer ${accessToken}`,
+      },
       form: {
         cid: data.cid,
         first_name: data.first_name,
         last_name: data.last_name,
-        password: data.password,
         session_id: data.session_id
       }
     };
