@@ -47,12 +47,10 @@ router.post('/', async (req: Request, res: Response) => {
         cid,
         email
       });
-      console.log(rs);
-
       if (rs.ok) {
         res.send({ ok: true, code: HttpStatus.OK });
       } else {
-        res.send({ ok: true, code: HttpStatus.OK });
+        res.send({ ok: true, error: rs.error, error_description: rs.error_description });
       }
     } else {
       res.status(HttpStatus.BAD_REQUEST);
@@ -86,12 +84,12 @@ router.post('/verify-kyc', async (req: Request, res: Response) => {
         last_name: lastName
       });
       console.log(rs);
-      res.send(rs);
-      // if (rs.ok) {
-      //   res.send({ ok: true, code: HttpStatus.OK });
-      // } else {
-      //   res.send({ ok: true, code: HttpStatus.OK });
-      // }
+
+      if (rs.ok) {
+        res.send({ ok: true, code: HttpStatus.OK });
+      } else {
+        res.send({ ok: true, error: rs.error, error_description: rs.error_description });
+      }
     } else {
       res.status(HttpStatus.BAD_REQUEST);
       res.send({ ok: false, code: HttpStatus.BAD_REQUEST, error: 'ข้อมูลไม่ครบถ้วน' })
