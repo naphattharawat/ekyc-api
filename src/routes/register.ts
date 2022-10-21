@@ -86,12 +86,12 @@ router.post('/verify-kyc', async (req: Request, res: Response) => {
         last_name: lastName
       });
       console.log(rs);
-
-      if (rs.ok) {
-        res.send({ ok: true, code: HttpStatus.OK });
-      } else {
-        res.send({ ok: true, code: HttpStatus.OK });
-      }
+      res.send(rs);
+      // if (rs.ok) {
+      //   res.send({ ok: true, code: HttpStatus.OK });
+      // } else {
+      //   res.send({ ok: true, code: HttpStatus.OK });
+      // }
     } else {
       res.status(HttpStatus.BAD_REQUEST);
       res.send({ ok: false, code: HttpStatus.BAD_REQUEST, error: 'ข้อมูลไม่ครบถ้วน' })
