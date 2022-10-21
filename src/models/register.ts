@@ -28,6 +28,31 @@ export class RegisterModel {
     });
   }
 
+  verifyKyc(data) {
+    const options = {
+      method: 'POST',
+      url: 'https://members.moph.go.th/api/v1/m/register/kyc',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      form: {
+        cid: data.cid,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        password: data.password,
+        session_id: data.session_id
+      }
+    };
+    return new Promise<void>((resolve, reject) => {
+      request(options, function (error, response, body) {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(JSON.parse(body))
+        }
+        // console.log(body);
+      });
+    });
+  }
+
   ekycCreate() {
     const key = process.env.ekyc_appId;
     const options = {
@@ -99,6 +124,9 @@ export class RegisterModel {
 
   saveUser(db, data) {
     return db('users').insert(data);
+  }
+  updateUser(db, cid, data) {
+    return db('users').insert(data).where('cid', cid);
   }
 
 }
