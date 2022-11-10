@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+        <title>Debt Now App - Appcast</title>
+        <item>
+            <title>Version 1.0.2</title>
+            <description>desc</description>
+            <pubDate>Sun, 30 Dec 2018 12:00:00 +0000</pubDate>
+            <enclosure url="https://play.google.com/store/apps/details?id=th.go.moph.mymoph" sparkle:version="1.0.2" sparkle:os="android" />
+        </item>
+      <item>
+        <title>Version 1.0.2</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:13 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="1.0.2" sparkle:os="iOS" />
+        <sparkle:minimumSystemVersion>12.0.0</sparkle:minimumSystemVersion>
+    </item>
+    </channel>
+</rss>
