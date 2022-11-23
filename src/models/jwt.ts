@@ -27,4 +27,8 @@ export class Jwt {
     });
   }
 
+  async decoded(token: string) {
+    return await jwt.decode(token);
+  }
+
 }

@@ -187,6 +187,17 @@ router.post('/ekyc/front', upload.any(), async (req: Request, res: Response) => 
         console.log(filePath, newPath);
         await fs.renameSync(filePath, newPath);
       }
+      console.log(rs);
+      // {
+      //   message: 'Uploads success',
+      //   data: {
+      //     title: 'นาย',
+      //     fname: 'ณภัทรวัฒน์',
+      //     lname: 'สามพวงทอง',
+      //     citizenId: '1100400728564',
+      //     dob: '2537-12-05'
+      //   }
+      // }
 
       res.send({ ok: true, message: rs.message })
     } else {
@@ -203,23 +214,16 @@ router.post('/ekyc/back', upload.any(), async (req: Request, res: Response) => {
     const sessionId = req.body.sessionId;
     if (req.files.length) {
       const filePath = req.files[0].path || null;
-      const rs: any = await registerModel.ekycFace(sessionId, filePath, 'back')
+      const rs: any = await registerModel.ekycFace(sessionId, filePath, 'back');
+      console.log(rs);
+
       if (rs.message == 'ไม่สามารถอ่าน ID Card ได้ กรุณาตรวจสอบรูปภาพ') {
         const newPath = path.join(uploadDir, 'back-error', sessionId + '_' + Date.now() + path.extname(req.files[0].originalname));
         console.log(filePath, newPath);
         await fs.renameSync(filePath, newPath);
       }
-      // 0|api  | {
-      //   0|api  |   fieldname: 'image',
-      //   0|api  |   originalname: 'back.png',
-      //   0|api  |   encoding: '7bit',
-      //   0|api  |   mimetype: 'application/octet-stream',
-      //   0|api  |   destination: './uploads',
-      //   0|api  |   filename: '1666328908666.png',
-      //   0|api  |   path: 'uploads/1666328908666.png',
-      //   0|api  |   size: 283310
-      //   0|api  | }
-      res.send({ ok: true, message: rs.message })
+      let data = rs.data ? rs.data.laserCode : {};
+      res.send({ ok: true, message: rs.message, data: data })
     } else {
       res.send({ ok: false })
     }
@@ -232,7 +236,11 @@ router.post('/ekyc/back', upload.any(), async (req: Request, res: Response) => {
 router.post('/ekyc/complete', async (req: Request, res: Response) => {
   try {
     const sessionId = req.body.sessionId;
+    console.log(sessionId);
+
     const rs: any = await registerModel.ekycComplete(sessionId)
+    console.log(rs);
+
     // const info: any = await registerModel.ekycInfoBeforeComplete(sessionId);
     // rs.info = info;
     res.send(rs);

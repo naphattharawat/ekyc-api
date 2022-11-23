@@ -22,6 +22,7 @@ import loginAuthRoute from './routes/login_auth';
 import devicesRoute from './routes/device';
 import profilesRoute from './routes/profile';
 import payslipRoute from './routes/payslip';
+import hrRoute from './routes/hr';
 import registerRoute from './routes/register';
 
 // Assign router to the express.Router() instance
@@ -102,6 +103,7 @@ app.use('/login/bio', loginAuthRoute);
 app.use('/devices', checkAuth, devicesRoute);
 app.use('/profiles', checkAuth, profilesRoute);
 app.use('/payslips', checkAuth, payslipRoute);
+app.use('/hr', checkAuth, hrRoute);
 app.use('/register', registerRoute);
 app.use('/', indexRoute);
 
