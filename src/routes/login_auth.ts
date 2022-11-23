@@ -18,14 +18,13 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     let deviceId: string = req.body.deviceId;
     let cid: string = req.body.cid;
-    const data: any = {};
+    const data: any = {};   
     if (deviceId && cid) {
       await loginModel.saveLog(req.db, deviceId, 'SHORT_LOGIN');
       let token: any = {
         device_id: deviceId,
         cid: cid
       };
-      delete token.cid;
       data.token = jwt.sign(token);
       data.ok = true;
       res.send(data);

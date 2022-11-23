@@ -17,6 +17,8 @@ let refreshToken: any = null;
 router.get('/', async (req: Request, res: Response) => {
   try {
     const decoded = req.decoded;
+    console.log(decoded);
+    
     if (decoded.cid) {
       const c: any = await hrModel.checkToken(accessToken, refreshToken);
       if (c.ok) {
