@@ -165,7 +165,10 @@ router.post('/ekyc/face', upload.any(), async (req: Request, res: Response) => {
     const sessionId = req.body.sessionId;
     if (req.files.length) {
       const filePath = req.files[0].path || null;
+      console.log(sessionId, filePath);
       const rs: any = await registerModel.ekycFace(sessionId, filePath, 'face')
+      console.log(rs);
+
       res.send({ ok: true, message: rs.message })
     } else {
       res.send({ ok: false })
@@ -236,14 +239,23 @@ router.post('/ekyc/back', upload.any(), async (req: Request, res: Response) => {
 router.post('/ekyc/complete', async (req: Request, res: Response) => {
   try {
     const sessionId = req.body.sessionId;
-    console.log(sessionId);
-
-    const rs: any = await registerModel.ekycComplete(sessionId)
-    console.log(rs);
+    let data:any = {};
+    const rs: any = await registerModel.ekycComplete(sessionId);
+    if (rs.message == 'Completed') {
+      const info: any = await registerModel.ekycGetResult(sessionId);
+      if (info.completed) {
+       data = info;
+       data.ok = true;
+      } else{
+        data.ok=false
+      }
+    }else{
+      data.ok=false
+    }
 
     // const info: any = await registerModel.ekycInfoBeforeComplete(sessionId);
     // rs.info = info;
-    res.send(rs);
+    res.send(data);
   } catch (error) {
     res.status(HttpStatus.BAD_GATEWAY);
     res.send({ ok: false, error: error.message, code: HttpStatus.BAD_GATEWAY });

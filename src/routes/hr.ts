@@ -17,21 +17,21 @@ let refreshToken: any = null;
 router.get('/', async (req: Request, res: Response) => {
   try {
     const decoded = req.decoded;
-    console.log(decoded);
-
     if (decoded.cid) {
       const c: any = await hrModel.checkToken(accessToken, refreshToken);
       if (c.ok) {
         accessToken = c.access_token;
         refreshToken = c.refresh_token;
         const rs: any = await hrModel.getData(decoded.cid, accessToken);
+        console.log(decoded.cid,rs);
+        
         if (rs.data) {
           res.send(rs);
         } else {
           res.send({ ok: false, error: 'ไม่พบข้อมูล' })
         }
       } else {
-        res.send({ ok: false, error: 'ไม่พบข้อมูล' })
+        res.send({ ok: false, error: 'ไม่พบข้อมูล.' })
       }
     } else {
       res.send({ ok: false, error: 'ไม่พบเลขบัตรประชาชน' })
