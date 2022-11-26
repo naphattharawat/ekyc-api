@@ -18,6 +18,8 @@ const router: Router = Router();
 const uploadDir = process.env.UPLOAD_TEMP_DIR || './uploads';
 
 fse.ensureDirSync(uploadDir);
+fse.ensureDirSync(path.join(uploadDir, 'back-error'));
+fse.ensureDirSync(path.join(uploadDir, 'front-error'));
 
 var storage = multer.diskStorage({
   destination: function (req: any, file: any, cb: any) {
@@ -43,11 +45,11 @@ router.post('/', async (req: Request, res: Response) => {
         email: email
       }
       const rs: any = await registerModel.register(obj);
-      await registerModel.saveUser(req.db, {
-        cid,
-        email
-      });
       if (rs.ok) {
+        await registerModel.saveUser(req.db, {
+          cid,
+          email
+        });
         res.send({ ok: true, code: HttpStatus.OK });
       } else {
         res.send({ ok: false, error: rs.error, error_description: rs.error_description });
@@ -80,13 +82,11 @@ router.post('/verify-kyc', async (req: Request, res: Response) => {
         session_id: sessionId
       }
       const rs: any = await registerModel.verifyKyc(accessToken, obj);
-      await registerModel.updateUser(req.db, cid, {
-        first_name: firstName,
-        last_name: lastName
-      });
-      console.log(rs);
-
       if (rs.ok) {
+        await registerModel.updateUser(req.db, cid, {
+          first_name: firstName,
+          last_name: lastName
+        });
         res.send({ ok: true, code: HttpStatus.OK });
       } else {
         res.send({ ok: false, error: rs.error, error_description: rs.error_description });
@@ -151,7 +151,6 @@ router.post('/verify-kyc', async (req: Request, res: Response) => {
 router.post('/ekyc', async (req: Request, res: Response) => {
   try {
     const rs: any = await registerModel.ekycCreate()
-    console.log(rs);
     res.send(rs)
   } catch (error) {
     res.status(HttpStatus.BAD_GATEWAY);
@@ -165,11 +164,12 @@ router.post('/ekyc/face', upload.any(), async (req: Request, res: Response) => {
     const sessionId = req.body.sessionId;
     if (req.files.length) {
       const filePath = req.files[0].path || null;
-      console.log(sessionId, filePath);
       const rs: any = await registerModel.ekycFace(sessionId, filePath, 'face')
-      console.log(rs);
-
-      res.send({ ok: true, message: rs.message })
+      if (rs.statusCode == 200) {
+        res.send({ ok: true, message: rs.message })
+      } else {
+        res.send({ ok: false, message: rs.message })
+      }
     } else {
       res.send({ ok: false })
     }
@@ -185,12 +185,10 @@ router.post('/ekyc/front', upload.any(), async (req: Request, res: Response) => 
     if (req.files.length) {
       const filePath = req.files[0].path || null;
       const rs: any = await registerModel.ekycFace(sessionId, filePath, 'idcard')
-      if (rs.message == 'ไม่สามารถอ่าน ID Card ได้ กรุณาตรวจสอบรูปภาพ') {
+      if (rs.statusCode != 200) {
         const newPath = path.join(uploadDir, 'front-error', sessionId + '_' + Date.now() + path.extname(req.files[0].originalname));
-        console.log(filePath, newPath);
         await fs.renameSync(filePath, newPath);
       }
-      console.log(rs);
       // {
       //   message: 'Uploads success',
       //   data: {
@@ -201,8 +199,11 @@ router.post('/ekyc/front', upload.any(), async (req: Request, res: Response) => 
       //     dob: '2537-12-05'
       //   }
       // }
-
-      res.send({ ok: true, message: rs.message })
+      if (rs.statusCode == 200) {
+        res.send({ ok: true, message: rs.message, data: rs.data })
+      } else {
+        res.send({ ok: false, message: rs.message })
+      }
     } else {
       res.send({ ok: false })
     }
@@ -218,15 +219,17 @@ router.post('/ekyc/back', upload.any(), async (req: Request, res: Response) => {
     if (req.files.length) {
       const filePath = req.files[0].path || null;
       const rs: any = await registerModel.ekycFace(sessionId, filePath, 'back');
-      console.log(rs);
-
-      if (rs.message == 'ไม่สามารถอ่าน ID Card ได้ กรุณาตรวจสอบรูปภาพ') {
+      if (rs.statusCode != 200) {
         const newPath = path.join(uploadDir, 'back-error', sessionId + '_' + Date.now() + path.extname(req.files[0].originalname));
-        console.log(filePath, newPath);
         await fs.renameSync(filePath, newPath);
       }
-      let data = rs.data ? rs.data.laserCode : {};
-      res.send({ ok: true, message: rs.message, data: data })
+
+      if (rs.statusCode == 200) {
+        res.send({ ok: true, message: rs.message, data: rs.data })
+      } else {
+        res.send({ ok: false, message: rs.message })
+      }
+
     } else {
       res.send({ ok: false })
     }
@@ -239,18 +242,22 @@ router.post('/ekyc/back', upload.any(), async (req: Request, res: Response) => {
 router.post('/ekyc/complete', async (req: Request, res: Response) => {
   try {
     const sessionId = req.body.sessionId;
-    let data:any = {};
+    let data: any = {};
     const rs: any = await registerModel.ekycComplete(sessionId);
     if (rs.message == 'Completed') {
       const info: any = await registerModel.ekycGetResult(sessionId);
       if (info.completed) {
-       data = info;
-       data.ok = true;
-      } else{
-        data.ok=false
+        await registerModel.updateUser(req.db, info.idCardNumber, {
+          sessions_id: sessionId,
+          is_ekyc: info.idCardDopaPassed && info.faceVerificationPassed ? 'Y' : 'N'
+        });
+        data = info;
+        data.ok = true;
+      } else {
+        data.ok = false
       }
-    }else{
-      data.ok=false
+    } else {
+      data.ok = false
     }
 
     // const info: any = await registerModel.ekycInfoBeforeComplete(sessionId);
@@ -261,4 +268,67 @@ router.post('/ekyc/complete', async (req: Request, res: Response) => {
     res.send({ ok: false, error: error.message, code: HttpStatus.BAD_GATEWAY });
   }
 });
+
+router.post('/ekyc/complete/v2', async (req: Request, res: Response) => {
+  try {
+    let accessToken = req.body.accessToken;
+    const sessionId = req.body.sessionId;
+    console.log(sessionId);
+    
+    let data: any = {};
+    const info: any = await registerModel.ekycInfoBeforeComplete(sessionId);
+    if (info.sessionId) {
+      const rs: any = await registerModel.ekycComplete(sessionId);
+      if (rs.message == 'Completed') {
+        const result: any = await registerModel.ekycGetResult(sessionId);
+        if (result.faceVerificationPassed && result.idCardDopaPassed) {
+          if (info.idNumber && info.firstNameTh && info.lastNameTh && sessionId) {
+            const obj: any = {
+              cid: info.idNumber,
+              first_name: info.firstNameTh,
+              last_name: info.lastNameTh,
+              session_id: sessionId
+            }
+            const rs: any = await registerModel.verifyKyc(accessToken, obj);
+            console.log('verifyKyc',rs);
+            
+            if (rs.ok) {
+              console.log(info);
+              
+              await registerModel.updateUser(req.db, info.idNumber, {
+                first_name: info.firstNameTh,
+                last_name: info.lastNameTh,
+                sessions_id: sessionId,
+                is_ekyc: result.idCardDopaPassed && result.faceVerificationPassed ? 'Y' : 'N'
+              });
+              data.ok = true;
+            } else {
+              data.ok = false;
+              data.error_code = 1;
+              data.error = rs.error;
+              data.error_description = rs.error_description;
+            }
+          } else {
+            data.ok = false;
+            data.error_code = 2;
+          }
+        } else {
+          data.ok = false;
+          data.error_code = 3;
+        }
+      } else {
+        data.ok = false
+        data.error_code = 4;
+      }
+    } else {
+      data.ok = false;
+      data.error_code = 5;
+    }
+    res.send(data);
+  } catch (error) {
+    res.status(HttpStatus.BAD_GATEWAY);
+    res.send({ ok: false, error: error.message, code: HttpStatus.BAD_GATEWAY });
+  }
+});
+
 export default router;

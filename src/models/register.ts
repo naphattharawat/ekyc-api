@@ -33,24 +33,25 @@ export class RegisterModel {
       method: 'POST',
       url: 'https://members.moph.go.th/api/v1/m/is_kyc',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
       },
-      form: {
+      body: {
         cid: data.cid,
         first_name: data.first_name,
         last_name: data.last_name,
         session_id: data.session_id
-      }
+      },
+      json: true
     };
     return new Promise<void>((resolve, reject) => {
       request(options, function (error, response, body) {
         if (error) {
           reject(error)
         } else {
-          resolve(JSON.parse(body))
+          // console.log(body);
+          resolve(body)
         }
-        // console.log(body);
       });
     });
   }
@@ -95,7 +96,9 @@ export class RegisterModel {
         if (error) {
           reject(error)
         } else {
-          resolve(JSON.parse(body));
+          const rep = JSON.parse(body);
+          rep.statusCode = response.statusCode;
+          resolve(rep);
         }
       });
     })
@@ -169,7 +172,13 @@ export class RegisterModel {
     return db('users').insert(data);
   }
   updateUser(db, cid, data) {
-    return db('users').insert(data).where('cid', cid);
+    return db('users').update(data).where('cid', cid);
   }
 
+
+  updateKYC(db, sessionId) {
+    return db('users')
+      .where('sessions_id', sessionId)
+      .update('is_kyc', 'Y');
+  }
 }
