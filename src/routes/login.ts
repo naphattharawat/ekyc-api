@@ -21,15 +21,19 @@ router.post('/', async (req: Request, res: Response) => {
     let username: string = req.body.username;
     let password: string = req.body.password;
     let deviceInfo: any = req.body.deviceInfo;
-    let data: any = {};
+    // let data: any = {};
     let rs: any = await loginModel.login(username, password);
-    console.log(rs);
-    
+    console.log(rs.access_token);
+
     if (rs.access_token) {
-      data.oauth.access_token = rs.access_token;
-      data.oauth.cid = rs.cid;
-      data.oauth.refresh_token = rs.refresh_token;
-      data.oauth.expires_in = rs.expires_in;
+      let data: any = {
+        oauth: {
+          access_token: rs.access_token,
+          cid: rs.cid,
+          refresh_token: rs.refresh_token,
+          expires_in: rs.expires_in
+        }
+      }
 
       if (deviceInfo.deviceId) {
         const obj: any = {
@@ -50,7 +54,7 @@ router.post('/', async (req: Request, res: Response) => {
         data.token = jwt.sign(token);
         data.ok = true;
         res.send(data);
-      }else{
+      } else {
         res.status(500)
         res.send({ ok: false, error: rs.error, message: 'device not found' });
       }
@@ -59,6 +63,8 @@ router.post('/', async (req: Request, res: Response) => {
       res.send({ ok: false, error: rs.error, message: rs.message });
     }
   } catch (error) {
+    console.log(error);
+
     res.status(HttpStatus.BAD_GATEWAY);
     res.send({ ok: false, error: error.message });
   }
