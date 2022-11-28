@@ -69,6 +69,8 @@ export class HrModel {
             // let now = DateTime.now();
         } else {
             const auth: any = await this.authen();
+            console.log(auth);
+            
             if (auth.ok) {
                 return auth;
             } else {
