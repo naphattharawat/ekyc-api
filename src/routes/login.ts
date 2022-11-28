@@ -23,6 +23,8 @@ router.post('/', async (req: Request, res: Response) => {
     let deviceInfo: any = req.body.deviceInfo;
     let data: any = {};
     let rs: any = await loginModel.login(username, password);
+    console.log(rs);
+    
     if (rs.access_token) {
       data.oauth.access_token = rs.access_token;
       data.oauth.cid = rs.cid;
