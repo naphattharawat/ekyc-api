@@ -24,7 +24,11 @@ router.post('/', async (req: Request, res: Response) => {
     let data: any = {};
     let rs: any = await loginModel.login(username, password);
     if (rs.access_token) {
-      data.oauth = rs;
+      data.oauth.access_token = rs.access_token;
+      data.oauth.cid = rs.cid;
+      data.oauth.refresh_token = rs.refresh_token;
+      data.oauth.expires_in = rs.expires_in;
+
       if (deviceInfo.deviceId) {
         const obj: any = {
           device_id: deviceInfo.deviceId,
@@ -44,6 +48,9 @@ router.post('/', async (req: Request, res: Response) => {
         data.token = jwt.sign(token);
         data.ok = true;
         res.send(data);
+      }else{
+        res.status(500)
+        res.send({ ok: false, error: rs.error, message: 'device not found' });
       }
     } else {
       res.status(401)
