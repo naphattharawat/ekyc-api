@@ -18,12 +18,12 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const decoded = req.decoded;
     if (decoded.cid) {
-      const c: any = await hrModel.checkToken(accessToken, refreshToken);
+      const c: any = await hrModel.authen();
       if (c.ok) {
         accessToken = c.access_token;
         refreshToken = c.refresh_token;
         const rs: any = await hrModel.getData(decoded.cid, accessToken);
-        console.log(decoded.cid,rs);
+        // console.log(decoded.cid,rs);
         
         if (rs.data) {
           res.send(rs);

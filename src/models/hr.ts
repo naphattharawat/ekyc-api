@@ -46,8 +46,11 @@ export class HrModel {
 
     async checkToken(accessToken, refreshToken) {
         if (accessToken) {
+            // console.log('accessToken', accessToken);
             const decoded: any = await jwtModel.decoded(accessToken);
-            let expiryDate = moment(decoded.exp, 'X');
+            console.log(decoded);
+
+            let expiryDate = moment(decoded.exp, 'X')
             let now = moment();
             if (expiryDate.isBefore(now)) {
                 const r: any = await this.refreshToken(refreshToken);
@@ -58,27 +61,23 @@ export class HrModel {
                         refresh_token: refreshToken
                     }
                 }
-            }else{
+            } else {
                 return {
                     ok: true,
                     access_token: accessToken,
                     refresh_token: refreshToken
                 }
             }
-
-            // let now = DateTime.now();
         } else {
             const auth: any = await this.authen();
-            console.log(auth);
-            
             if (auth.ok) {
                 return auth;
             } else {
                 return { ok: false };
             }
         }
-
     }
+
     getData(cid, accessToken) {
         var options = {
             'method': 'GET',
