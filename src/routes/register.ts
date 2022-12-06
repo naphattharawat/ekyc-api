@@ -279,7 +279,7 @@ router.post('/ekyc/complete/v2', async (req: Request, res: Response) => {
     const info: any = await registerModel.ekycGetResult(sessionId);
     if (info.statusCode == 200) {
       const rs: any = await registerModel.ekycComplete(sessionId);
-      if (rs.message == 'Completed') {
+      if (rs.statusCode == 200) {
         const result: any = await registerModel.ekycGetResult(sessionId);
         if (result.faceVerificationPassed && result.idCardDopaPassed) {
           if (info.idCardNumber && info.idCardFirstNameTh && info.idCardLastNameTh && sessionId) {

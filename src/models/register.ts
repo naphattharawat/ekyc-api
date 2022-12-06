@@ -115,12 +115,12 @@ export class RegisterModel {
       },
       form: { updateType: 'Complete' }
     };
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<any>((resolve, reject) => {
       request(options, function (error, response, body) {
         if (error) {
-          reject(error)
+          reject({ statusCode: response.statusCode, error: error });
         } else {
-          resolve(JSON.parse(body));
+          resolve({ statusCode: response.statusCode, body: JSON.parse(body) });
         }
       });
     })
@@ -138,7 +138,7 @@ export class RegisterModel {
     return new Promise<any>((resolve, reject) => {
       request(options, function (error, response, body: any) {
         if (error) {
-          reject({ statusCode: response.statusCode, error: error});
+          reject({ statusCode: response.statusCode, error: error });
         } else {
           resolve({ statusCode: response.statusCode, body: JSON.parse(body) });
         }
