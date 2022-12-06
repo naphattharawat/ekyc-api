@@ -276,17 +276,17 @@ router.post('/ekyc/complete/v2', async (req: Request, res: Response) => {
     console.log(sessionId);
     
     let data: any = {};
-    const info: any = await registerModel.ekycInfoBeforeComplete(sessionId);
+    const info: any = await registerModel.ekycGetResult(sessionId);
     if (info.sessionId) {
       const rs: any = await registerModel.ekycComplete(sessionId);
       if (rs.message == 'Completed') {
         const result: any = await registerModel.ekycGetResult(sessionId);
         if (result.faceVerificationPassed && result.idCardDopaPassed) {
-          if (info.idNumber && info.firstNameTh && info.lastNameTh && sessionId) {
+          if (info.idCardNumber && info.idCardFirstNameTh && info.idCardLastNameTh && sessionId) {
             const obj: any = {
-              cid: info.idNumber,
-              first_name: info.firstNameTh,
-              last_name: info.lastNameTh,
+              cid: info.idCardNumber,
+              first_name: info.idCardFirstNameTh,
+              last_name: info.idCardLastNameTh,
               session_id: sessionId
             }
             const rs: any = await registerModel.verifyKyc(accessToken, obj);
@@ -295,9 +295,9 @@ router.post('/ekyc/complete/v2', async (req: Request, res: Response) => {
             if (rs.ok) {
               console.log(info);
               
-              await registerModel.updateUser(req.db, info.idNumber, {
-                first_name: info.firstNameTh,
-                last_name: info.lastNameTh,
+              await registerModel.updateUser(req.db, info.idCardNumber, {
+                first_name: info.idCardFirstNameTh,
+                last_name: info.idCardLastNameTh,
                 sessions_id: sessionId,
                 is_ekyc: result.idCardDopaPassed && result.faceVerificationPassed ? 'Y' : 'N'
               });
