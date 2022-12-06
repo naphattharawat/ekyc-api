@@ -125,6 +125,33 @@ export class RegisterModel {
       });
     })
   }
+  ekycEditData(sessionId,cid,fname,lname,dob,laser) {
+    const key = process.env.ekyc_appId;
+    const options = {
+      method: 'POST',
+      url: `https://rmsservice.moph.go.th/MobileIdService/api/v2/Sessions/${sessionId}/edit-infomation`,
+      headers: {
+        apiKey: key,
+        'Content-Type': 'application/json'
+      },
+      form: {
+        "idNumber": cid,
+        "firstNameTh": fname,
+        "lastNameTh": lname,
+        "dateOfBirth": dob,
+        "laserCode": laser
+    }
+    };
+    return new Promise<any>((resolve, reject) => {
+      request(options, function (error, response, body) {
+        if (error) {
+          reject({ statusCode: response.statusCode, error: error });
+        } else {
+          resolve({ statusCode: response.statusCode, body: JSON.parse(body) });
+        }
+      });
+    })
+  }
   ekycGetResult(sessionId) {
     const key = process.env.ekyc_appId;
     const options = {

@@ -269,6 +269,22 @@ router.post('/ekyc/complete', async (req: Request, res: Response) => {
   }
 });
 
+router.post('/ekyc/edit-data', async (req: Request, res: Response) => {
+  try {
+    // const sessionId = req.body.sessionId;
+    const body = req.body;
+    const rs: any = await registerModel.ekycEditData(body.sessionId, body.cid, body.fname, body.lname, body.dob, body.laser);
+    if (rs.statusCode == 200) {
+      res.send({ ok: true });
+    } else {
+      res.send({ ok: false });
+    }
+  } catch (error) {
+    res.status(HttpStatus.BAD_GATEWAY);
+    res.send({ ok: false, error: error.message, code: HttpStatus.BAD_GATEWAY });
+  }
+});
+
 router.post('/ekyc/complete/v2', async (req: Request, res: Response) => {
   try {
     let accessToken = req.body.accessToken;
