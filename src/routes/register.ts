@@ -274,10 +274,10 @@ router.post('/ekyc/complete/v2', async (req: Request, res: Response) => {
     let accessToken = req.body.accessToken;
     const sessionId = req.body.sessionId;
     console.log(sessionId);
-    
+
     let data: any = {};
     const info: any = await registerModel.ekycGetResult(sessionId);
-    if (info.sessionId) {
+    if (info.statusCode == 200) {
       const rs: any = await registerModel.ekycComplete(sessionId);
       if (rs.message == 'Completed') {
         const result: any = await registerModel.ekycGetResult(sessionId);
@@ -290,11 +290,11 @@ router.post('/ekyc/complete/v2', async (req: Request, res: Response) => {
               session_id: sessionId
             }
             const rs: any = await registerModel.verifyKyc(accessToken, obj);
-            console.log('verifyKyc',rs);
-            
+            console.log('verifyKyc', rs);
+
             if (rs.ok) {
               console.log(info);
-              
+
               await registerModel.updateUser(req.db, info.idCardNumber, {
                 first_name: info.idCardFirstNameTh,
                 last_name: info.idCardLastNameTh,

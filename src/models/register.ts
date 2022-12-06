@@ -135,12 +135,12 @@ export class RegisterModel {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
     };
-    return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
+    return new Promise<any>((resolve, reject) => {
+      request(options, function (error, response, body: any) {
         if (error) {
-          reject(error)
+          reject({ statusCode: response.statusCode, error: error});
         } else {
-          resolve(JSON.parse(body));
+          resolve({ statusCode: response.statusCode, body: JSON.parse(body) });
         }
       });
     })
