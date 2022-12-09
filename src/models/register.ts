@@ -104,6 +104,36 @@ export class RegisterModel {
     })
   }
 
+  ekycManaual(sessionId, filePath, type) {
+    const key = process.env.ekyc_appId;
+    const options = {
+      method: 'POST',
+      url: `https://rmsservice.moph.go.th/MobileIdService/api/v2/Sessions/${sessionId}/manaual-selfie`,
+      headers: {
+        apiKey: key,
+        'Content-Type': 'multipart/form-data'
+      },
+      formData: {
+        documentType: type,
+        file: {
+          value: fs.createReadStream(filePath),
+          options: { filename: filePath, contentType: null }
+        }
+      }
+    };
+    return new Promise<void>((resolve, reject) => {
+      request(options, function (error, response, body) {
+        if (error) {
+          reject(error)
+        } else {
+          const rep = JSON.parse(body);
+          rep.statusCode = response.statusCode;
+          resolve(rep);
+        }
+      });
+    })
+  }
+
   ekycComplete(sessionId) {
     const key = process.env.ekyc_appId;
     const options = {
@@ -125,7 +155,9 @@ export class RegisterModel {
       });
     })
   }
-  ekycEditData(sessionId,cid,fname,lname,dob,laser) {
+  ekycEditData(sessionId, cid, fname, lname, dob, laser) {
+    console.log(sessionId, cid, fname, lname, dob, laser);
+    
     const key = process.env.ekyc_appId;
     const options = {
       method: 'POST',
@@ -134,20 +166,21 @@ export class RegisterModel {
         apiKey: key,
         'Content-Type': 'application/json'
       },
-      form: {
+      body: {
         "idNumber": cid,
         "firstNameTh": fname,
         "lastNameTh": lname,
         "dateOfBirth": dob,
         "laserCode": laser
-    }
+      },
+      json: true
     };
     return new Promise<any>((resolve, reject) => {
       request(options, function (error, response, body) {
         if (error) {
           reject({ statusCode: response.statusCode, error: error });
         } else {
-          resolve({ statusCode: response.statusCode, body: JSON.parse(body) });
+          resolve({ statusCode: response.statusCode, body: body });
         }
       });
     })
@@ -198,8 +231,28 @@ export class RegisterModel {
   saveUser(db, data) {
     return db('users').insert(data);
   }
+
   updateUser(db, cid, data) {
     return db('users').update(data).where('cid', cid);
+  }
+
+  insertUserProfile(db, cid, firstName, lastName) {
+    const sql = `insert into users (cid,first_name,last_name) values (?,?,?) 
+    on duplicate key update first_name=?,last_name=?`;
+    return db.raw(sql, [cid, firstName, lastName, firstName, lastName])
+  }
+  updateUserProfile(db, cid, firstName, lastName, sessionId) {
+    const sql = `insert into users (cid,first_name,last_name,sessions_id) values (?,?,?,?) 
+    on duplicate key update first_name=?,last_name=?,sessions_id=?`;
+    return db.raw(sql, [cid, firstName, lastName, sessionId, firstName, lastName, sessionId])
+  }
+
+  updateUserKyc(db, cid, isKyc) {
+    return db('users').update({ 'is_ekyc': isKyc }).where('cid', cid);
+  }
+
+  getUser(db, cid) {
+    return db('users').where('cid', cid);
   }
 
 

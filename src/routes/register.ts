@@ -239,6 +239,48 @@ router.post('/ekyc/back', upload.any(), async (req: Request, res: Response) => {
   }
 });
 
+router.post('/ekyc/manual/face', upload.any(), async (req: Request, res: Response) => {
+  try {
+    const sessionId = req.body.sessionId;
+    if (req.files.length) {
+      const filePath = req.files[0].path || null;
+      const rs: any = await registerModel.ekycManaual(sessionId, filePath, 'face');
+      if (rs.statusCode == 200) {
+        res.send({ ok: true, message: rs.message, data: rs.data })
+      } else {
+        res.send({ ok: false, message: rs.message })
+      }
+
+    } else {
+      res.send({ ok: false })
+    }
+  } catch (error) {
+    res.status(HttpStatus.BAD_GATEWAY);
+    res.send({ ok: false, error: error.message, code: HttpStatus.BAD_GATEWAY });
+  }
+});
+
+router.post('/ekyc/manual/idcard', upload.any(), async (req: Request, res: Response) => {
+  try {
+    const sessionId = req.body.sessionId;
+    if (req.files.length) {
+      const filePath = req.files[0].path || null;
+      const rs: any = await registerModel.ekycManaual(sessionId, filePath, 'idcard');
+      if (rs.statusCode == 200) {
+        res.send({ ok: true, message: rs.message, data: rs.data })
+      } else {
+        res.send({ ok: false, message: rs.message })
+      }
+
+    } else {
+      res.send({ ok: false })
+    }
+  } catch (error) {
+    res.status(HttpStatus.BAD_GATEWAY);
+    res.send({ ok: false, error: error.message, code: HttpStatus.BAD_GATEWAY });
+  }
+});
+
 router.post('/ekyc/complete', async (req: Request, res: Response) => {
   try {
     const sessionId = req.body.sessionId;
@@ -274,6 +316,8 @@ router.post('/ekyc/edit-data', async (req: Request, res: Response) => {
     // const sessionId = req.body.sessionId;
     const body = req.body;
     const rs: any = await registerModel.ekycEditData(body.sessionId, body.cid, body.fname, body.lname, body.dob, body.laser);
+    console.log(rs);
+
     if (rs.statusCode == 200) {
       res.send({ ok: true });
     } else {
@@ -340,6 +384,100 @@ router.post('/ekyc/complete/v2', async (req: Request, res: Response) => {
       data.ok = false;
       data.error_code = 5;
     }
+    res.send(data);
+  } catch (error) {
+    res.status(HttpStatus.BAD_GATEWAY);
+    res.send({ ok: false, error: error.message, code: HttpStatus.BAD_GATEWAY });
+  }
+});
+
+router.post('/ekyc/complete/v3', async (req: Request, res: Response) => {
+  try {
+    let accessToken = req.body.accessToken;
+    const sessionId = req.body.sessionId;
+    let data: any = {};
+    const info: any = await registerModel.ekycGetResult(sessionId);
+    if (info.statusCode == 200) {
+      if(info.body.idCardNumber.length == 13){
+        await registerModel.updateUserProfile(req.db, info.body.idCardNumber,
+          info.body.idCardFirstNameTh,
+          info.body.idCardLastNameTh,
+          sessionId
+        );
+      } else{
+        data.ok = false;
+        data.error_code = 7;
+      }
+      const cp: any = await registerModel.ekycComplete(sessionId);
+      // let status;
+      if (cp.statusCode == 200) {
+        // waiting,Updated,complete,Canceled  
+        if (cp.body.status == 'complete' || cp.body.status == 'completed') {
+          // dopa  ผ่านและรูปผ่าน
+          data.status = 'COMPLETED';
+          if (info.body.idCardNumber && info.body.idCardFirstNameTh && info.body.idCardLastNameTh && sessionId) {
+            const obj: any = {
+              cid: info.body.idCardNumber,
+              first_name: info.body.idCardFirstNameTh,
+              last_name: info.body.idCardLastNameTh,
+              session_id: sessionId
+            }
+            const vk: any = await registerModel.verifyKyc(accessToken, obj);
+            console.log('verifyKyc', vk);
+            if (vk.ok) {
+              console.log(info.body);
+              await registerModel.updateUserKyc(req.db, info.body.idCardNumber,
+                cp.body.status_dopa && cp.body.status_facecompare ? 'Y' : 'N'
+              );
+              data.ok = true;
+            } else {
+              data.ok = false;
+              data.error_code = 1;
+              data.error = vk.error;
+              data.error_description = vk.error_description;
+            }
+          } else {
+            data.ok = false;
+            data.error_code = 2;
+          }
+        } else if (cp.body.status == 'Updated' || cp.body.status == 'updated') {
+          // dopa ไม่ผ่าน
+          data.status = 'DOPA_FAILED'
+          data.ok = false;
+          data.error_code = 3;
+        } else if (cp.body.status == 'waiting') {
+          if(cp.body.status_dopa){
+            //dopa ผ่าน + รูปไม่ผ่าน ไปอัพโหลด
+            data.status = 'WAIT_UPLOAD';
+            data.ok = false
+            data.error_code = 4;
+          } else {
+            // dopa ไม่ผ่าน
+            data.status = 'DOPA_FAILED'
+            data.ok = false;
+            data.error_code = 3;
+          }
+        } else {
+          data.status = cp.body.status;
+        }
+
+      } else {
+        data.ok = false
+        data.error_code = 5;
+        console.log(cp);
+        
+      }
+    } else {
+      data.ok = false;
+      data.error_code = 6;
+    }
+    // code 7 = เลขบัตรไม่ = 13
+    // code 6 = get result error 
+    // code 5 = complete error
+    // code 4 = compare face ไม่ผ่าน หรือแก้ไขเกิน 3 ตัวอักษร
+    // code 3 = Dopa failed
+    // code 2 = ข้อมูลไม่สมบูรณ์
+    // code 1 = update member ไม่ได้
     res.send(data);
   } catch (error) {
     res.status(HttpStatus.BAD_GATEWAY);
