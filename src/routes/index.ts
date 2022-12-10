@@ -1,3 +1,4 @@
+import { PrModel } from './../models/pr';
 import { RegisterModel } from './../models/register';
 import * as express from 'express';
 import { Router, Request, Response } from 'express';
@@ -8,7 +9,7 @@ import * as HttpStatus from 'http-status-codes';
 const jwt = new Jwt();
 const registerModel = new RegisterModel();
 const router: Router = Router();
-
+const prModel = new PrModel();
 router.get('/', (req: Request, res: Response) => {
   res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
 });
@@ -76,6 +77,16 @@ router.post('/testmq', (req: Request, res: Response) => {
 
 
   res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
+});
+
+router.get('/rss_prmoph', async (req: Request, res: Response) => {
+  try {
+    const id = req.query.id;
+    const rs: any = await prModel.getPR(id);
+    res.send({ ok: true, rows: rs.body });
+  } catch (error) {
+
+  }
 });
 
 
