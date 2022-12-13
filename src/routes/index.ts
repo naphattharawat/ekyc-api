@@ -86,7 +86,6 @@ router.get('/rss_prmoph', routeCache.cacheSeconds(300), async (req: Request, res
   try {
     const id = req.query.id;
     const rs: any = await prModel.getPR(id);
-    console.log(rs);
     res.send({ ok: true, rows: rs.body });
   } catch (error) {
 
