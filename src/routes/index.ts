@@ -40,7 +40,9 @@ router.post('/ekyc', async (req: Request, res: Response) => {
             last_name: info[0].last_name,
             session_id: body.sessionId
           }
-          const vf: any = await registerModel.verifyKyc(accessToken, obj);
+          const vf: any = await registerModel.verifyKycV2(obj);
+          console.log(vf);
+          
           if (vf.ok) {
             await registerModel.updateKYC(req.db, body.sessionId);
             res.send({ ok: true });

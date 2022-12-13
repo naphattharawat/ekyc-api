@@ -55,6 +55,32 @@ export class RegisterModel {
       });
     });
   }
+  verifyKycV2(data) {
+    const options = {
+      method: 'POST',
+      url: 'https://members.moph.go.th/api/v2/m/is_kyc',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: {
+        cid: data.cid,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        session_id: data.session_id
+      },
+      json: true
+    };
+    return new Promise<void>((resolve, reject) => {
+      request(options, function (error, response, body) {
+        if (error) {
+          reject(error)
+        } else {
+          // console.log(body);
+          resolve(body)
+        }
+      });
+    });
+  }
 
   ekycCreate() {
     const key = process.env.ekyc_appId;
