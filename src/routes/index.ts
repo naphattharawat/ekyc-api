@@ -3,6 +3,7 @@ import { RegisterModel } from './../models/register';
 import * as express from 'express';
 import { Router, Request, Response } from 'express';
 import { Jwt } from '../models/jwt';
+var routeCache = require('route-cache');
 
 import * as HttpStatus from 'http-status-codes';
 
@@ -42,7 +43,7 @@ router.post('/ekyc', async (req: Request, res: Response) => {
           }
           const vf: any = await registerModel.verifyKycV2(obj);
           console.log(vf);
-          
+
           if (vf.ok) {
             await registerModel.updateKYC(req.db, body.sessionId);
             res.send({ ok: true });
@@ -81,7 +82,7 @@ router.post('/testmq', (req: Request, res: Response) => {
   res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
 });
 
-router.get('/rss_prmoph', async (req: Request, res: Response) => {
+router.get('/rss_prmoph', routeCache.cacheSeconds(300), async (req: Request, res: Response) => {
   try {
     const id = req.query.id;
     const rs: any = await prModel.getPR(id);
