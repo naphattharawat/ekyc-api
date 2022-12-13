@@ -27,7 +27,7 @@ import registerRoute from './routes/register';
 
 // Assign router to the express.Router() instance
 const app: express.Application = express();
-
+var mqtt = require('mqtt')
 const jwt = new Jwt();
 
 //view engine setup
@@ -73,6 +73,38 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   req.db = db;
   next();
 });
+app.use((req: Request, res: Response, next: NextFunction) => {
+
+  const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
+  var client = mqtt.connect('mqtt://mqtt-mymoph.moph.go.th',
+    {
+      clientId: clientId,
+      username: process.env.MQTT_USERNAME,
+      password: process.env.MQTT_PASSWORD
+    });
+
+  client.on('connect', function () {
+    // client.subscribe('mymoph/test', function (err) {
+      // if (!err) {
+      //   client.publish('presence', 'Hello mqtt')
+      // }
+    // })
+  })
+  client.on('connected', function () {
+    console.log('connected');
+  })
+  client.on('disconnect', function () {
+    console.log('disconnect');
+  })
+
+  client.on('message', function (topic, message) {
+    // message is Buffer
+    console.log(message.toString())
+    client.end()
+  })
+  req.mqttClient = client;
+  next();
+});
 
 let checkAuth = (req: Request, res: Response, next: NextFunction) => {
   let token: string = null;
@@ -97,6 +129,9 @@ let checkAuth = (req: Request, res: Response, next: NextFunction) => {
       });
     });
 }
+
+
+
 
 app.use('/login', loginRoute);
 app.use('/login/bio', loginAuthRoute);

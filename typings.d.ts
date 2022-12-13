@@ -6,5 +6,6 @@ declare module 'express' {
     knex: Knex,
     decoded: any // Actually should be something like `multer.Files`.
     files: any
+    mqttClient: any
   }
 }

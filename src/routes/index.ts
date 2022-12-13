@@ -21,6 +21,7 @@ router.get('/privacy', (req: Request, res: Response) => {
 
 router.post('/ekyc', async (req: Request, res: Response) => {
   const body = req.body;
+  const client = req.mqttClient;
   let accessToken;
   // {
   //   success: 'อนุมัติ',
@@ -35,6 +36,7 @@ router.post('/ekyc', async (req: Request, res: Response) => {
       if (rs.body.idCardDopaPassed && rs.body.faceVerificationPassed) {
         const info: any = await registerModel.getUser(req.db, rs.body.idCardNumber);
         if (info[0].sessions_id == body.sessionId) {
+          const device: any = await registerModel.getDevice(req.db, rs.body.idCardNumber);
           const obj: any = {
             cid: info[0].cid,
             first_name: info[0].first_name,
@@ -42,9 +44,12 @@ router.post('/ekyc', async (req: Request, res: Response) => {
             session_id: body.sessionId
           }
           const vf: any = await registerModel.verifyKycV2(obj);
-          console.log(vf);
-
           if (vf.ok) {
+            // mqtt
+            for (const d of device) {
+              const topic = `mymoph/${d.device_id}`;
+              client.publish(topic, '{"topic":"KYC","status":true}');
+            }
             await registerModel.updateKYC(req.db, body.sessionId);
             res.send({ ok: true });
           } else {
@@ -67,10 +72,8 @@ router.post('/ekyc', async (req: Request, res: Response) => {
 });
 
 router.get('/testmq', (req: Request, res: Response) => {
-  console.log(req.body);
-  console.log(req.body.session_id);
-
-
+  const client = req.mqttClient;
+  client.publish('mymoph/test', '{"name":"value"}');
   res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
 });
 

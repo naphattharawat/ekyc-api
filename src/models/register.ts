@@ -280,6 +280,10 @@ export class RegisterModel {
   getUser(db, cid) {
     return db('users').where('cid', cid);
   }
+  
+  getDevice(db, cid) {
+    return db('devices').where('cid', cid);
+  }
 
 
   updateKYC(db, sessionId) {
