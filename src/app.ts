@@ -18,6 +18,7 @@ import { Jwt } from './models/jwt';
 
 import indexRoute from './routes/index';
 import loginRoute from './routes/login';
+import logoutRoute from './routes/logout';
 import loginAuthRoute from './routes/login_auth';
 import devicesRoute from './routes/device';
 import profilesRoute from './routes/profile';
@@ -85,9 +86,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
   client.on('connect', function () {
     // client.subscribe('mymoph/test', function (err) {
-      // if (!err) {
-      //   client.publish('presence', 'Hello mqtt')
-      // }
+    // if (!err) {
+    //   client.publish('presence', 'Hello mqtt')
+    // }
     // })
   })
   client.on('connected', function () {
@@ -134,6 +135,7 @@ let checkAuth = (req: Request, res: Response, next: NextFunction) => {
 
 
 app.use('/login', loginRoute);
+app.use('/logout', checkAuth, logoutRoute);
 app.use('/login/bio', loginAuthRoute);
 app.use('/devices', checkAuth, devicesRoute);
 app.use('/profiles', checkAuth, profilesRoute);

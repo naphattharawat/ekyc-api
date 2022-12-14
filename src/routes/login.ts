@@ -44,16 +44,6 @@ router.post('/', async (req: Request, res: Response) => {
           device_id: deviceInfo.deviceId,
           cid: rs.cid
         }
-        let data: any = {
-          ok: true,
-          token: jwt.sign(token),
-          oauth: {
-            access_token: rs.access_token,
-            cid: rs.cid,
-            refresh_token: rs.refresh_token,
-            expires_in: rs.expires_in
-          }
-        }
         res.send({
           ok: true,
           token: jwt.sign(token),
