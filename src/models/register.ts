@@ -183,7 +183,7 @@ export class RegisterModel {
   }
   ekycEditData(sessionId, cid, fname, lname, dob, laser) {
     console.log(sessionId, cid, fname, lname, dob, laser);
-    
+
     const key = process.env.ekyc_appId;
     const options = {
       method: 'POST',
@@ -280,9 +280,11 @@ export class RegisterModel {
   getUser(db, cid) {
     return db('users').where('cid', cid);
   }
-  
+
   getDevice(db, cid) {
-    return db('devices').where('cid', cid);
+    return db('devices')
+      .where('cid', cid)
+      .where('status', 'ONLINE');
   }
 
 

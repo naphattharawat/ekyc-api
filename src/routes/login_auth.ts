@@ -1,8 +1,8 @@
-import { DeviceModel } from '../models/devices';
 /// <reference path="../../typings.d.ts" />
 
 import { Router, Request, Response } from 'express';
 import * as HttpStatus from 'http-status-codes';
+import { DeviceModel } from '../models/devices';
 
 import { LoginModel } from '../models/login';
 
@@ -10,7 +10,7 @@ import { Jwt } from '../models/jwt';
 
 const loginModel = new LoginModel();
 const jwt = new Jwt();
-
+const deviceModel = new DeviceModel();
 const router: Router = Router();
 
 
@@ -18,8 +18,15 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     let deviceId: string = req.body.deviceId;
     let cid: string = req.body.cid;
+    let fcmToken: string = req.body.fcmToken;
     const data: any = {};   
     if (deviceId && cid) {
+      const obj: any = {
+        device_id: deviceId,
+        cid: cid,
+        fcm_token: fcmToken
+      }
+      await deviceModel.saveDevice(req.db, obj);
       await loginModel.saveLog(req.db, deviceId, 'SHORT_LOGIN');
       let token: any = {
         device_id: deviceId,
