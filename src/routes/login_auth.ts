@@ -40,6 +40,8 @@ router.post('/', async (req: Request, res: Response) => {
       res.send({ ok: false, error: 'ไม่พบ deviceId และ cid' });
     }
   } catch (error) {
+    console.log(error);
+    
     res.status(HttpStatus.BAD_GATEWAY);
     res.send({ ok: false, error: error.message });
   }
