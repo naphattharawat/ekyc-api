@@ -26,7 +26,7 @@ router.post('/', async (req: Request, res: Response) => {
         cid: cid,
         fcm_token: fcmToken
       }
-      await deviceModel.saveDevice(req.db, obj);
+      await deviceModel.saveDeviceBio(req.db, obj);
       await loginModel.saveLog(req.db, deviceId, 'SHORT_LOGIN');
       let token: any = {
         device_id: deviceId,
