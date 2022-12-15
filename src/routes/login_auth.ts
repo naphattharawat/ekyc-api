@@ -19,7 +19,7 @@ router.post('/', async (req: Request, res: Response) => {
     let deviceId: string = req.body.deviceId;
     let cid: string = req.body.cid;
     let fcmToken: string = req.body.fcmToken;
-    const data: any = {};   
+    const data: any = {};
     if (deviceId && cid) {
       const obj: any = {
         device_id: deviceId,
@@ -41,7 +41,23 @@ router.post('/', async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.log(error);
-    
+
+    res.status(HttpStatus.BAD_GATEWAY);
+    res.send({ ok: false, error: error.message });
+  }
+});
+
+router.get('/app', async (req: Request, res: Response) => {
+  try {
+    let appId: string = req.query.appId;
+    if (appId) {
+      const rs: any = await loginModel.getApp(req.db, appId);
+      res.send({ ok: true, rows: rs });
+    } else {
+      res.send({ ok: false });
+    }
+  } catch (error) {
+    console.log(error);
     res.status(HttpStatus.BAD_GATEWAY);
     res.send({ ok: false, error: error.message });
   }

@@ -79,4 +79,9 @@ export class LoginModel {
       device_id: deviceId, type
     })
   }
+
+  getApp(db, appId) {
+    return db('apps')
+      .where('app_id', appId)
+  }
 }
