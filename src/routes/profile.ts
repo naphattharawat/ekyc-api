@@ -14,6 +14,15 @@ const jwt = new Jwt();
 
 const router: Router = Router();
 
+router.get('/check', async (req: Request, res: Response) => {
+  try {
+    res.send({ ok: true });
+  } catch (error) {
+    res.status(HttpStatus.BAD_GATEWAY);
+    res.send({ ok: false, error: error.message });
+  }
+});
+
 router.get('/', async (req: Request, res: Response) => {
   try {
     let accessToken: string = req.query.accessToken;
