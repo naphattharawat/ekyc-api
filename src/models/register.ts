@@ -262,6 +262,11 @@ export class RegisterModel {
     return db('users').update(data).where('cid', cid);
   }
 
+  insertCidEmailProfile(db, cid, email) {
+    const sql = `insert into users (cid,email) values (?,?) 
+    on duplicate key update email=?`;
+    return db.raw(sql, [cid,email,email])
+  }
   insertUserProfile(db, cid, firstName, lastName) {
     const sql = `insert into users (cid,first_name,last_name) values (?,?,?) 
     on duplicate key update first_name=?,last_name=?`;

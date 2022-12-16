@@ -46,10 +46,10 @@ router.post('/', async (req: Request, res: Response) => {
       }
       const rs: any = await registerModel.register(obj);
       if (rs.ok) {
-        await registerModel.saveUser(req.db, {
+        await registerModel.insertCidEmailProfile(req.db,
           cid,
           email
-        });
+        );
         res.send({ ok: true, code: HttpStatus.OK });
       } else {
         res.send({ ok: false, error: rs.error, error_description: rs.error_description });
@@ -398,13 +398,13 @@ router.post('/ekyc/complete/v3', async (req: Request, res: Response) => {
     let data: any = {};
     const info: any = await registerModel.ekycGetResult(sessionId);
     if (info.statusCode == 200) {
-      if(info.body.idCardNumber.length == 13){
+      if (info.body.idCardNumber.length == 13) {
         await registerModel.updateUserProfile(req.db, info.body.idCardNumber,
           info.body.idCardFirstNameTh,
           info.body.idCardLastNameTh,
           sessionId
         );
-      } else{
+      } else {
         data.ok = false;
         data.error_code = 7;
       }
@@ -446,7 +446,7 @@ router.post('/ekyc/complete/v3', async (req: Request, res: Response) => {
           data.ok = false;
           data.error_code = 3;
         } else if (cp.body.status == 'waiting') {
-          if(cp.body.status_dopa){
+          if (cp.body.status_dopa) {
             //dopa ผ่าน + รูปไม่ผ่าน ไปอัพโหลด
             data.status = 'WAIT_UPLOAD';
             data.ok = false
@@ -465,7 +465,7 @@ router.post('/ekyc/complete/v3', async (req: Request, res: Response) => {
         data.ok = false
         data.error_code = 5;
         console.log(cp);
-        
+
       }
     } else {
       data.ok = false;
