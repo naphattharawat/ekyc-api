@@ -412,7 +412,7 @@ router.post('/ekyc/complete/v3', async (req: Request, res: Response) => {
       // let status;
       if (cp.statusCode == 200) {
         // waiting,Updated,complete,Canceled  
-        if (cp.body.status == 'complete' || cp.body.status == 'completed') {
+        if (cp.body.status == 'complete' || cp.body.status == 'completed' || cp.body.status == 'Complete' || cp.body.status == 'Completed') {
           // dopa  ผ่านและรูปผ่าน
           data.status = 'COMPLETED';
           if (info.body.idCardNumber && info.body.idCardFirstNameTh && info.body.idCardLastNameTh && sessionId) {
@@ -445,7 +445,7 @@ router.post('/ekyc/complete/v3', async (req: Request, res: Response) => {
           data.status = 'DOPA_FAILED'
           data.ok = false;
           data.error_code = 3;
-        } else if (cp.body.status == 'waiting') {
+        } else if (cp.body.status == 'waiting' || cp.body.status == 'Waiting') {
           if (cp.body.status_dopa) {
             //dopa ผ่าน + รูปไม่ผ่าน ไปอัพโหลด
             data.status = 'WAIT_UPLOAD';
@@ -458,6 +458,7 @@ router.post('/ekyc/complete/v3', async (req: Request, res: Response) => {
             data.error_code = 3;
           }
         } else {
+          data.ok = false;
           data.status = cp.body.status;
         }
 
