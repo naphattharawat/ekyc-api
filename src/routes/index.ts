@@ -132,14 +132,14 @@ router.post('/reset_password', async (req: Request, res: Response) => {
   const password = req.body.password;
   const rs: any = await registerModel.resetPasword(code, password, password);
   console.log(rs);
-  rs.send(rs);
+  res.send(rs);
 });
 
 router.post('/forgot_password', async (req: Request, res: Response) => {
   const email = req.body.email;
   const rs: any = await registerModel.forgotPasword(email);
   console.log(rs);
-  rs.send(rs);
+  res.send(rs);
 });
 
 
