@@ -265,7 +265,7 @@ export class RegisterModel {
   insertCidEmailProfile(db, cid, email) {
     const sql = `insert into users (cid,email) values (?,?) 
     on duplicate key update email=?`;
-    return db.raw(sql, [cid,email,email])
+    return db.raw(sql, [cid, email, email])
   }
   insertUserProfile(db, cid, firstName, lastName) {
     const sql = `insert into users (cid,first_name,last_name) values (?,?,?) 
@@ -297,5 +297,55 @@ export class RegisterModel {
     return db('users')
       .where('sessions_id', sessionId)
       .update('is_kyc', 'Y');
+  }
+
+
+  resetPasword(code, password, passwordConf) {
+    const options = {
+      method: 'POST',
+      url: `https://members.moph.go.th/api/v1/user/reset_password/${code}`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: {
+        password: password,
+        passwordConf: passwordConf
+      },
+      json: true
+    };
+    return new Promise<void>((resolve, reject) => {
+      request(options, function (error, response, body) {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(JSON.parse(body))
+        }
+        // console.log(body);
+      });
+    });
+  }
+
+  forgotPasword(email) {
+    const options = {
+      method: 'POST',
+      url: `https://members.moph.go.th/api/v1/m/forgot_password`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: {
+        email: email
+      },
+      json: true
+    };
+    return new Promise<void>((resolve, reject) => {
+      request(options, function (error, response, body) {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(JSON.parse(body))
+        }
+        // console.log(body);
+      });
+    });
   }
 }
