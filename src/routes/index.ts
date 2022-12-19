@@ -127,17 +127,17 @@ router.get('/rss_prmoph', routeCache.cacheSeconds(300), async (req: Request, res
   }
 });
 
-router.post('/reset_password', (req: Request, res: Response) => {
+router.post('/reset_password', async (req: Request, res: Response) => {
   const code = req.body.code;
   const password = req.body.password;
-  const rs: any = registerModel.resetPasword(code, password, password);
+  const rs: any = await registerModel.resetPasword(code, password, password);
   console.log(rs);
   rs.send(rs);
 });
 
-router.post('/forgot_password', (req: Request, res: Response) => {
+router.post('/forgot_password', async (req: Request, res: Response) => {
   const email = req.body.email;
-  const rs: any = registerModel.forgotPasword(email);
+  const rs: any = await registerModel.forgotPasword(email);
   console.log(rs);
   rs.send(rs);
 });
