@@ -18,16 +18,41 @@ const router: Router = Router();
 const uploadDir = process.env.UPLOAD_TEMP_DIR || './uploads';
 
 fse.ensureDirSync(uploadDir);
+fse.ensureDirSync(path.join(uploadDir, 'sessions'));
 fse.ensureDirSync(path.join(uploadDir, 'back-error'));
 fse.ensureDirSync(path.join(uploadDir, 'front-error'));
 
 var storage = multer.diskStorage({
   destination: function (req: any, file: any, cb: any) {
-    cb(null, uploadDir)
+    let pathDir = uploadDir;
+    // if (req.originalUrl == '/register/ekyc/face') {
+    //   pathDir = path.join(uploadDir, 'face');
+    // } else if (req.originalUrl == '/register/ekyc/front') {
+    //   pathDir = path.join(uploadDir, 'front');
+    // } else if (req.originalUrl == '/register/ekyc/back') {
+    //   pathDir = path.join(uploadDir, 'back');
+    // }
+    const sessionId = req.body.sessionId
+    if (sessionId) {
+      fse.ensureDirSync(path.join(uploadDir, 'sessions', sessionId));
+      pathDir = path.join(uploadDir, 'sessions', sessionId);
+    }
+    cb(null, pathDir)
   },
-  filename: function (req, file, cb) {
+  filename: async function (req, file, cb) {
     let _ext = path.extname(file.originalname);
-    cb(null, Date.now() + _ext)
+    let filename = Date.now() + _ext;
+    const sessionId = req.body.sessionId
+    if (sessionId) {
+      if (req.originalUrl == '/register/ekyc/face') {
+        filename = sessionId + '_face' + _ext;
+      } else if (req.originalUrl == '/register/ekyc/front') {
+        filename = sessionId + '_front' + _ext;
+      } else if (req.originalUrl == '/register/ekyc/back') {
+        filename = sessionId + '_back' + _ext;
+      }
+    }
+    cb(null, filename);
   }
 });
 let upload = multer({ storage: storage });
@@ -164,7 +189,7 @@ router.post('/ekyc/face', upload.any(), async (req: Request, res: Response) => {
     const sessionId = req.body.sessionId;
     if (req.files.length) {
       const filePath = req.files[0].path || null;
-      const rs: any = await registerModel.ekycFace(sessionId, filePath, 'face')
+      const rs: any = await registerModel.ekycFace(sessionId, filePath, 'face');      
       if (rs.statusCode == 200) {
         res.send({ ok: true, message: rs.message })
       } else {
