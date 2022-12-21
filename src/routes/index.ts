@@ -32,7 +32,6 @@ router.post('/ekyc', async (req: Request, res: Response) => {
   //   message: 'session 2c050c38-fef2-4ef6-b8fc-cf225776f23c ทำการยืนยันเสร็จสิ้น'
   // }
   console.log(body);
-  body.sessionId = 'a0484355-fdc6-402f-a9b2-72863a3bff18';
   if (body.sessionId) {
     const rs: any = await registerModel.ekycGetResult(body.sessionId);
     if (rs.statusCode == 200) {
