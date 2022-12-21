@@ -296,7 +296,7 @@ export class RegisterModel {
   updateKYC(db, sessionId) {
     return db('users')
       .where('sessions_id', sessionId)
-      .update('is_kyc', 'Y');
+      .update('is_ekyc', 'Y');
   }
 
 

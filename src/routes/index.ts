@@ -37,8 +37,14 @@ router.post('/ekyc', async (req: Request, res: Response) => {
     if (rs.statusCode == 200) {
       if (rs.body.idCardDopaPassed && rs.body.faceVerificationPassed) {
         const info: any = await registerModel.getUser(req.db, rs.body.idCardNumber);
+        console.log(rs.body);
+        console.log(info[0]);
+        
         if (info[0].sessions_id == body.sessionId) {
+          
           const device: any = await registerModel.getDevice(req.db, rs.body.idCardNumber);
+          console.log(device);
+          
           const obj: any = {
             cid: info[0].cid,
             first_name: info[0].first_name,
@@ -46,10 +52,14 @@ router.post('/ekyc', async (req: Request, res: Response) => {
             session_id: body.sessionId
           }
           const vf: any = await registerModel.verifyKycV2(obj);
+          console.log(vf);
+          
           if (vf.ok) {
             // mqtt
             for (const d of device) {
               // const topic = `mymoph/${d.device_id}`;
+              console.log(d.fcm_token);
+              
               fcmModel.sendMessage(d.fcm_token, 'ยืนยันตัวตนสำเร็จ', 'ยินดีด้วย คุณสามารถใช้ฟังชั่นต่างๆได้แล้ว', { GOTO: 'PINCODE' })
               // client.publish(topic, '{"topic":"KYC","status":true}');
             }
