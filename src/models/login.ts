@@ -58,7 +58,7 @@ export class LoginModel {
       url: 'https://members.moph.go.th/api/v1/m/oauth/refresh_token',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       form: {
-        client_id: 'nNzKqHtSXlQRYVujulAu',
+        client_id: process.env.mymoph_clientId,
         refresh_token: refreshToken
       }
     };
