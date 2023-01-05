@@ -8,7 +8,7 @@ export class SessionsModel {
     return db('devices')
       .where('cid', cid)
       .where('status', 'ONLINE')
-      .select('system_name', 'device_id', 'model_cersion')
+      .select('system_name', 'device_id', 'model_version')
 
   }
 
