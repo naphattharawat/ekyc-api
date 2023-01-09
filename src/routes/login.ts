@@ -91,7 +91,7 @@ router.post('/v2', async (req: Request, res: Response) => {
           model_version: deviceInfo.modelVersion,
           brand: deviceInfo.brand
         }
-        await deviceModel.saveDeviceV2(req.db, obj);
+        await deviceModel.saveDeviceV2(req.db, rs.cid, obj);
         await loginModel.saveLog(req.db, deviceInfo.deviceId, 'LONG_LOGIN');
         let token: any = {
           device_id: deviceInfo.deviceId,

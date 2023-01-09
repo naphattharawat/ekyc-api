@@ -30,7 +30,7 @@ router.post('/v2', async (req: Request, res: Response) => {
         model_version: body.modelVersion,
         brand: body.brand
       }
-      await deviceModel.saveDeviceV2(req.db, obj);
+      await deviceModel.saveDeviceV2(req.db, body.cid, obj);
       res.send({ ok: true });
     } else {
       res.send({ ok: false, error: 'no deviceId' });
