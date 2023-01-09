@@ -69,6 +69,59 @@ router.post('/', async (req: Request, res: Response) => {
     res.send({ ok: false, error: error.message });
   }
 });
+router.post('/v2', async (req: Request, res: Response) => {
+  try {
+    let username: string = req.body.username;
+    let password: string = req.body.password;
+    let deviceInfo: any = req.body.deviceInfo;
+    // let data: any = {};
+    let rs: any = await loginModel.login(username, password);
+    // console.log(rs.access_token);
+    if (rs.access_token) {
+      if (deviceInfo.deviceId) {
+        const obj: any = {
+          device_id: deviceInfo.deviceId,
+          cid: rs.cid,
+          fcm_token: deviceInfo.fcmToken,
+          os: deviceInfo.os,
+          version: deviceInfo.version,
+          phone_name: deviceInfo.phoneName,
+          sdk: deviceInfo.sdk,
+          model: deviceInfo.model,
+          model_version: deviceInfo.modelVersion,
+          brand: deviceInfo.brand
+        }
+        await deviceModel.saveDevice(req.db, obj);
+        await loginModel.saveLog(req.db, deviceInfo.deviceId, 'LONG_LOGIN');
+        let token: any = {
+          device_id: deviceInfo.deviceId,
+          cid: rs.cid
+        }
+        res.send({
+          ok: true,
+          token: jwt.sign(token),
+          oauth: {
+            access_token: rs.access_token,
+            cid: rs.cid,
+            refresh_token: rs.refresh_token,
+            expires_in: rs.expires_in
+          }
+        });
+      } else {
+        res.status(500)
+        res.send({ ok: false, error: rs.error, message: 'device not found' });
+      }
+    } else {
+      res.status(401)
+      res.send({ ok: false, error: rs.error, message: rs.message });
+    }
+  } catch (error) {
+    console.log(error);
+
+    res.status(HttpStatus.BAD_GATEWAY);
+    res.send({ ok: false, error: error.message });
+  }
+});
 
 // mymoph://qr?clientId=xxxxx&token=xxxxx&sessionId=xxx
 router.post('/qr', async (req: Request, res: Response) => {

@@ -15,6 +15,15 @@ const router: Router = Router();
 const prModel = new PrModel();
 var FCM = require('fcm-node');
 router.get('/', (req: Request, res: Response) => {
+  console.log(req.query);
+  res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
+});
+
+router.post('/', (req: Request, res: Response) => {
+  // "Key": "phr/hdc/upload/service_opd_screening/39937375-ea79-4805-8d2f-85f94f79a227.gz",
+  if (req.body.Key.split("/")[1] == 'test') {
+    console.log(req.body.Key);
+  }
   res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
 });
 
@@ -39,12 +48,12 @@ router.post('/ekyc', async (req: Request, res: Response) => {
         const info: any = await registerModel.getUser(req.db, rs.body.idCardNumber);
         console.log(rs.body);
         console.log(info[0]);
-        
+
         if (info[0].sessions_id == body.sessionId) {
-          
+
           const device: any = await registerModel.getDevice(req.db, rs.body.idCardNumber);
           console.log(device);
-          
+
           const obj: any = {
             cid: info[0].cid,
             first_name: info[0].first_name,
@@ -53,13 +62,13 @@ router.post('/ekyc', async (req: Request, res: Response) => {
           }
           const vf: any = await registerModel.verifyKycV2(obj);
           console.log(vf);
-          
+
           if (vf.ok) {
             // mqtt
             for (const d of device) {
               // const topic = `mymoph/${d.device_id}`;
               console.log(d.fcm_token);
-              
+
               fcmModel.sendMessage(d.fcm_token, 'ยืนยันตัวตนสำเร็จ', 'ยินดีด้วย คุณสามารถใช้ฟังชั่นต่างๆได้แล้ว', { GOTO: 'PINCODE' })
               // client.publish(topic, '{"topic":"KYC","status":true}');
             }
