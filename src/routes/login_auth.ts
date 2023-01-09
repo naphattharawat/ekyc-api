@@ -56,10 +56,17 @@ router.post('/v2', async (req: Request, res: Response) => {
       const obj: any = {
         device_id: deviceInfo.deviceId,
         cid: cid,
-        fcm_token: deviceInfo.fcmToken
+        fcm_token: deviceInfo.fcmToken,
+        os: deviceInfo.os,
+        version: deviceInfo.version,
+        phone_name: deviceInfo.phoneName,
+        sdk: deviceInfo.sdk,
+        model: deviceInfo.model,
+        model_version: deviceInfo.modelVersion,
+        brand: deviceInfo.brand
       }
       // await deviceModel.saveDeviceBio(req.db, obj);
-      await deviceModel.saveDeviceV2(req.db, cid, deviceInfo);
+      await deviceModel.saveDeviceV2(req.db, obj);
       await loginModel.saveLog(req.db, deviceInfo.deviceId, 'SHORT_LOGIN');
       let token: any = {
         device_id: deviceInfo.deviceId,
