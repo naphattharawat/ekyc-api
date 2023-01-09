@@ -15,7 +15,7 @@ export class SessionsModel {
     return db('devices')
       .where('cid', cid)
       .where('status', 'ONLINE')
-      .select('os', 'device_id', 'brand', 'model', 'model_marketing')
+      .select('os', 'device_id', 'brand', 'model', 'model_marketing','phone_name')
   }
 
 
