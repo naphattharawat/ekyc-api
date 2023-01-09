@@ -12,8 +12,6 @@ export class DeviceModel {
     // return db('devices').insert(data);
   }
   saveDeviceV2(db: Knex, data: any) {
-    console.log(data);
-
     const sql = `insert into devices 
     (device_id,cid,fcm_token,os,version,
       model,model_version,phone_name,sdk,brand,

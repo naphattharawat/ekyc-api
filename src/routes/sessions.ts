@@ -24,6 +24,16 @@ router.get('/', async (req: Request, res: Response) => {
     res.send({ ok: false, error: error.message });
   }
 });
+router.get('/v2', async (req: Request, res: Response) => {
+  try {
+    const cid = req.decoded.cid;
+    const rs: any = await sessionsModel.getSessionV2(req.db, cid)
+    res.send({ ok: true, rows: rs });
+  } catch (error) {
+    res.status(HttpStatus.BAD_GATEWAY);
+    res.send({ ok: false, error: error.message });
+  }
+});
 
 
 export default router;
