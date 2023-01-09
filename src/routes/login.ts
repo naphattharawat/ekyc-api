@@ -88,7 +88,7 @@ router.post('/v2', async (req: Request, res: Response) => {
           phone_name: deviceInfo.phoneName,
           sdk: deviceInfo.sdk,
           model: deviceInfo.model,
-          model_version: deviceInfo.modelVersion,
+          model_marketing: deviceInfo.modelMarketing,
           brand: deviceInfo.brand
         }
         await deviceModel.saveDeviceV2(req.db, obj);
