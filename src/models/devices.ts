@@ -11,16 +11,16 @@ export class DeviceModel {
     return db.raw(sql, [data.device_id, data.cid, data.fcm_token, data.system_name, data.version, data.model, data.model_version, data.fcm_token, data.system_name, data.version, data.model, data.model_version])
     // return db('devices').insert(data);
   }
-  saveDeviceV2(db: Knex, data: any) {
+  saveDeviceV2(db: Knex, cid, data: any) {
     console.log(data);
-    
+
     const sql = `insert into devices 
     (device_id,cid,fcm_token,os,version,
       model,model_version,phone_name,sdk,brand,
       last_login,status) values  (?,?,?,?,?,?,?,?,?,?,${db.fn.now()},'ONLINE') on duplicate key update 
     fcm_token=?,os=?,version=?,model=?,model_version=?,phone_name=?,sdk=?,brand=?,last_login=${db.fn.now()},status='ONLINE'`;
     return db.raw(sql, [
-      data.device_id, data.cid, data.fcm_token, data.os, data.version,
+      data.device_id, cid, data.fcm_token, data.os, data.version,
       data.model, data.model_version, data.phone_name, data.sdk, data.brand,
       data.fcm_token, data.os, data.version, data.model, data.model_version, data.phone_name, data.sdk, data.brand])
     // return db('devices').insert(data);
