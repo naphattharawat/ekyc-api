@@ -17,7 +17,11 @@ export class PaySlipModel {
                     if (error) {
                         reject(error)
                     } else {
-                        resolve(JSON.parse(body))
+                        try {
+                            resolve(JSON.parse(body))
+                        } catch (error) {
+                            reject(error)
+                        }
                     }
                 });
             });
@@ -41,7 +45,11 @@ export class PaySlipModel {
                     if (error) {
                         reject(error)
                     } else {
-                        resolve(JSON.parse(body))
+                        try {
+                            resolve(JSON.parse(body))
+                        } catch (error) {
+                            reject(error)
+                        }
                     }
                 });
             });
