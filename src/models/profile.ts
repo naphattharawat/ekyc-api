@@ -24,5 +24,17 @@ export class ProfileModel {
     });
   }
 
+  getDipchip(db, sessionId) {
+    return db('dipchip_sessions')
+      .select('cid','session_id')
+      .where({
+        'session_id': sessionId
+      });
+  }
+  
+  saveDipchip(db, data) {
+    return db('dipchip_sessions').insert(data);
+  }
+
 
 }

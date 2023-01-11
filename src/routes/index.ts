@@ -160,10 +160,40 @@ router.post('/dipchip', async (req: Request, res: Response) => {
     const sessionId = req.body.session_id;
     const accessToken = req.body.access_token;
     const refreshToken = req.body.refresh_token;
+    const cid = sessionId.split("-")[0];
+    const fname = sessionId.split("-")[1];
+    const lname = sessionId.split("-")[2];
+    const newSessionId = `${sessionId.split("-")[0]}-${sessionId.split("-")[3]}`;
+    // save session for verify
     const rs: any = await profileModel.getProfile(accessToken);
-    console.log(rs);
+    if (rs.cid) {
+      if (rs.cid == cid) {
+        const insert = await profileModel.saveDipchip(req.db, {
+          cid, session_id: newSessionId
+        })
+        // send ISKYC;
 
-    res.send({ ok: true });
+        res.send({ ok: true });
+      } else {
+        res.send({ ok: false });
+      }
+    } else {
+      res.send({ ok: false });
+    }
+  } catch (error) {
+    res.send({ ok: false });
+  }
+});
+
+router.get('/dipchip', async (req: Request, res: Response) => {
+  try {
+    const sessionId = req.query.sessionId;
+    const rs: any = await profileModel.getDipchip(req.db, sessionId);
+    if (rs.length) {
+      res.send({ ok: true, rows: rs[rs.length - 1] });
+    } else {
+      res.send({ ok: false });
+    }
   } catch (error) {
     res.send({ ok: false });
   }
