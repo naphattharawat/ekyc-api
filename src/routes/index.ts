@@ -1,3 +1,4 @@
+import { ProfileModel } from './../models/profile';
 import { FcmModel } from './../models/fcm';
 import { PrModel } from './../models/pr';
 import { RegisterModel } from './../models/register';
@@ -13,6 +14,7 @@ const registerModel = new RegisterModel();
 const fcmModel = new FcmModel();
 const router: Router = Router();
 const prModel = new PrModel();
+const profileModel = new ProfileModel();
 var FCM = require('fcm-node');
 router.get('/', (req: Request, res: Response) => {
   console.log(req.query);
@@ -155,10 +157,15 @@ router.post('/forgot_password', async (req: Request, res: Response) => {
 
 router.post('/dipchip', async (req: Request, res: Response) => {
   try {
-    const body = req.body;
-    console.log(body);
+    const sessionId = req.body.session_id;
+    const accessToken = req.body.access_token;
+    const refreshToken = req.body.refresh_token;
+    const rs: any = await profileModel.getProfile(accessToken);
+    console.log(rs);
 
+    res.send({ ok: true });
   } catch (error) {
+    res.send({ ok: false });
   }
 });
 
