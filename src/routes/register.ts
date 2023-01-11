@@ -452,7 +452,7 @@ router.post('/ekyc/complete/v3', async (req: Request, res: Response) => {
             if (vk.ok) {
               console.log(info.body);
               await registerModel.updateUserKyc(req.db, info.body.idCardNumber,
-                cp.body.status_dopa && cp.body.status_facecompare ? 'Y' : 'N'
+                cp.body.idCardDopaPassed && cp.body.faceVerificationPassed ? 'Y' : 'N'
               );
               data.ok = true;
             } else {

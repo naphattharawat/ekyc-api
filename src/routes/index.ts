@@ -19,13 +19,6 @@ router.get('/', (req: Request, res: Response) => {
   res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
 });
 
-router.post('/', (req: Request, res: Response) => {
-  // "Key": "phr/hdc/upload/service_opd_screening/39937375-ea79-4805-8d2f-85f94f79a227.gz",
-  if (req.body.Key.split("/")[1] == 'test') {
-    console.log(req.body.Key);
-  }
-  res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
-});
 
 router.get('/privacy', (req: Request, res: Response) => {
   res.render('privacy');
@@ -160,6 +153,14 @@ router.post('/forgot_password', async (req: Request, res: Response) => {
   res.send(rs);
 });
 
+router.post('/dipchip', async (req: Request, res: Response) => {
+  try {
+    const body = req.body;
+    console.log(body);
+
+  } catch (error) {
+  }
+});
 
 
 export default router;
