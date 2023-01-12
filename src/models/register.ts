@@ -83,6 +83,7 @@ export class RegisterModel {
   }
 
   verifyKycDipchip(data) {
+
     const options = {
       method: 'POST',
       url: 'https://members.moph.go.th/api/v1/m/is_dipchip',
@@ -98,14 +99,18 @@ export class RegisterModel {
       json: true
     };
     return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject(error)
-        } else {
-          // console.log(body);
-          resolve(body)
-        }
-      });
+      try {
+        request(options, function (error, response, body) {
+          if (error) {
+            reject(error)
+          } else {
+            // console.log(body);
+            resolve(body)
+          }
+        });
+      } catch (error) {
+        reject(error)
+      }
     });
   }
 

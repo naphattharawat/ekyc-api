@@ -218,6 +218,7 @@ router.get('/dipchip', async (req: Request, res: Response) => {
     const sessionId = req.query.sessionId;
     const rs: any = await profileModel.getDipchip(req.db, sessionId);
     if (rs.length) {
+      console.log(sessionId, rs[rs.length - 1]);
       res.send({ ok: true, rows: rs[rs.length - 1] });
     } else {
       res.send({ ok: false });
