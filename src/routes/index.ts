@@ -189,16 +189,26 @@ router.post('/dipchip', async (req: Request, res: Response) => {
           await registerModel.updateKYCDip(req.db, newSessionId, cid);
           res.send({ ok: true });
         } else {
-          res.send({ ok: false });
+          console.log(rsDC);
+
+          console.log('error vf');
+
+          res.send({ ok: false, error: 'error vf' });
 
         }
       } else {
-        res.send({ ok: false });
+        console.log('cid!=cid');
+
+        res.send({ ok: false, error: 'cid!=cid' });
       }
     } else {
-      res.send({ ok: false });
+      console.log('errgetpf');
+
+      res.send({ ok: false, error: 'getpf' });
     }
   } catch (error) {
+    console.log(error);
+
     res.send({ ok: false });
   }
 });
