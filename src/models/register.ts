@@ -334,7 +334,7 @@ export class RegisterModel {
   updateKYCDip(db, sessionId, cid) {
     return db('users as u')
       .join('dipchip_sessions as d', 'u.cid', 'd.cid')
-      .where('d.sessions_id', sessionId)
+      .where('d.session_id', sessionId)
       .where('d.cid', cid)
       .update('u.is_ekyc', 'Y');
   }
