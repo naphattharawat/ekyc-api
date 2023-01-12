@@ -47,7 +47,7 @@ router.post('/ekyc', async (req: Request, res: Response) => {
         if (info[0].sessions_id == body.sessionId) {
 
           const device: any = await registerModel.getDevice(req.db, rs.body.idCardNumber);
-          console.log(device);
+
 
           const obj: any = {
             cid: info[0].cid,
@@ -171,9 +171,27 @@ router.post('/dipchip', async (req: Request, res: Response) => {
         const insert = await profileModel.saveDipchip(req.db, {
           cid, session_id: newSessionId
         })
-        // send ISKYC;
 
-        res.send({ ok: true });
+        // send ISKYC;
+        const rsDC: any = await registerModel.verifyKycDipchip({
+          cid: cid,
+          first_name: fname,
+          last_name: lname,
+          session_id: newSessionId
+        });
+
+        if (rsDC.ok) {
+          const device: any = await registerModel.getDevice(req.db, cid);
+          for (const d of device) {
+            fcmModel.sendMessage(d.fcm_token, 'ยืนยันตัวตนสำเร็จ', 'ยินดีด้วย คุณสามารถใช้ฟังชั่นต่างๆได้แล้ว', { GOTO: 'PINCODE' })
+            // client.publish(topic, '{"topic":"KYC","status":true}');
+          }
+          await registerModel.updateKYCDip(req.db, newSessionId, cid);
+          res.send({ ok: true });
+        } else {
+          res.send({ ok: false });
+
+        }
       } else {
         res.send({ ok: false });
       }

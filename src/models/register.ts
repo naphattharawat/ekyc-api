@@ -82,6 +82,33 @@ export class RegisterModel {
     });
   }
 
+  verifyKycDipchip(data) {
+    const options = {
+      method: 'POST',
+      url: 'https://members.moph.go.th/api/v1/m/is_dipchip',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: {
+        cid: data.cid,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        session_id: data.session_id
+      },
+      json: true
+    };
+    return new Promise<void>((resolve, reject) => {
+      request(options, function (error, response, body) {
+        if (error) {
+          reject(error)
+        } else {
+          // console.log(body);
+          resolve(body)
+        }
+      });
+    });
+  }
+
   ekycCreate() {
     const key = process.env.ekyc_appId;
     const options = {
@@ -297,6 +324,14 @@ export class RegisterModel {
     return db('users')
       .where('sessions_id', sessionId)
       .update('is_ekyc', 'Y');
+  }
+
+  updateKYCDip(db, sessionId, cid) {
+    return db('users as u')
+      .join('dipchip_sessions as d', 'u.cid', 'd.cid')
+      .where('d.sessions_id', sessionId)
+      .where('d.cid', cid)
+      .update('u.is_ekyc', 'Y');
   }
 
 
