@@ -22,6 +22,8 @@ export class HrModel {
                     if (error) {
                         reject(error)
                     } else {
+                        console.log(body);
+                        
                         resolve(JSON.parse(body))
                     }
                 });
