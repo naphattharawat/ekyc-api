@@ -50,7 +50,11 @@ export class HrModel {
                 if (error) {
                     reject(error)
                 } else {
-                    resolve(JSON.parse(body))
+                    if (isJSON(body)) {
+                        resolve(JSON.parse(body))
+                    } else {
+                        reject({ ok: false })
+                    }
                 }
             });
         });
@@ -104,7 +108,11 @@ export class HrModel {
                 if (error) {
                     reject(error)
                 } else {
-                    resolve(JSON.parse(body))
+                    if (isJSON(body)) {
+                        resolve(JSON.parse(body))
+                    } else {
+                        reject({ ok: false })
+                    }
                 }
             });
         });
