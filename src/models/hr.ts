@@ -25,7 +25,7 @@ export class HrModel {
                         if (isJSON(body)) {
                             resolve(JSON.parse(body))
                         } else {
-                            reject()
+                            reject({ ok: false })
                         }
                     }
                 });
