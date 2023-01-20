@@ -323,6 +323,12 @@ export class RegisterModel {
       .where('cid', cid)
       .where('status', 'ONLINE');
   }
+  getDeviceFcm(db, cid) {
+    return db('devices')
+      .where('cid', cid)
+      .where('status', 'ONLINE')
+      .groupBy('fcm_token')
+  }
 
 
   updateKYC(db, sessionId) {

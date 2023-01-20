@@ -181,7 +181,7 @@ router.post('/dipchip', async (req: Request, res: Response) => {
         });
 
         if (rsDC.ok) {
-          const device: any = await registerModel.getDevice(req.db, cid);
+          const device: any = await registerModel.getDeviceFcm(req.db, cid);
           for (const d of device) {
             fcmModel.sendMessage(d.fcm_token, 'ยืนยันตัวตนสำเร็จ', 'ยินดีด้วย คุณสามารถใช้ฟังชั่นต่างๆได้แล้ว', { GOTO: 'PINCODE' })
             // client.publish(topic, '{"topic":"KYC","status":true}');
