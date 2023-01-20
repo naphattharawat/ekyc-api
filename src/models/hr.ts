@@ -1,6 +1,6 @@
 import { Jwt } from './jwt';
 import e = require("express");
-
+var isJSON = require('is-json');
 const request = require('request');
 const moment = require('moment');
 const jwtModel = new Jwt();
@@ -22,9 +22,11 @@ export class HrModel {
                     if (error) {
                         reject(error)
                     } else {
-                        console.log(body);
-                        
-                        resolve(JSON.parse(body))
+                        if (isJSON(body)) {
+                            resolve(JSON.parse(body))
+                        } else {
+                            reject()
+                        }
                     }
                 });
             } catch (error) {
