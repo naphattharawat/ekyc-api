@@ -7,6 +7,8 @@ const jwtModel = new Jwt();
 export class HrModel {
 
     authen() {
+
+
         var options = {
             'method': 'POST',
             'url': 'http://203.157.102.224/auth/create-token',
@@ -15,14 +17,20 @@ export class HrModel {
             }
         };
         return new Promise<void>((resolve, reject) => {
-            request(options, function (error, response, body) {
-                if (error) {
-                    reject(error)
-                } else {
-                    resolve(JSON.parse(body))
-                }
-            });
+            try {
+                request(options, function (error, response, body) {
+                    if (error) {
+                        reject(error)
+                    } else {
+                        resolve(JSON.parse(body))
+                    }
+                });
+            } catch (error) {
+                reject(error)
+            }
         });
+
+
     }
 
     refreshToken(refreshToken) {
