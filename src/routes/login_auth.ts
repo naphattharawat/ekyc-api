@@ -66,7 +66,11 @@ router.post('/v2', async (req: Request, res: Response) => {
         brand: deviceInfo.brand
       }
       // await deviceModel.saveDeviceBio(req.db, obj);
-      await deviceModel.saveDeviceV2(req.db, obj);
+      try {
+        await deviceModel.saveDeviceV2(req.db, obj);
+      } catch (error) {
+        console.log('catch', error);
+      }
       await loginModel.saveLog(req.db, deviceInfo.deviceId, 'SHORT_LOGIN');
       let token: any = {
         device_id: deviceInfo.deviceId,
