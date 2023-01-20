@@ -17,6 +17,10 @@ export class DeviceModel {
       model,model_marketing,phone_name,sdk,brand,
       last_login,status) values  (?,?,?,?,?,?,?,?,?,?,${db.fn.now()},'ONLINE') on duplicate key update 
     fcm_token=?,os=?,version=?,model=?,model_marketing=?,phone_name=?,sdk=?,brand=?,last_login=${db.fn.now()},status='ONLINE'`;
+    console.log(db.raw(sql, [
+      data.device_id, data.cid, data.fcm_token, data.os, data.version,
+      data.model, data.model_marketing, data.phone_name, data.sdk, data.brand,
+      data.fcm_token, data.os, data.version, data.model, data.model_marketing, data.phone_name, data.sdk, data.brand]).toString())
     return db.raw(sql, [
       data.device_id, data.cid, data.fcm_token, data.os, data.version,
       data.model, data.model_marketing, data.phone_name, data.sdk, data.brand,
