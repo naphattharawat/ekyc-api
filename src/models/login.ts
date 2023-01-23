@@ -19,7 +19,12 @@ export class LoginModel {
         if (error) {
           reject(error)
         } else {
-          resolve(JSON.parse(body))
+          if (response.statusCode == 200) {
+            resolve(JSON.parse(body))
+          } else {
+            reject(body);
+          }
+
         }
         // console.log(body);
       });
