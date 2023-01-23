@@ -130,7 +130,8 @@ router.post('/testmq', (req: Request, res: Response) => {
   res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
 });
 
-router.get('/rss_prmoph', routeCache.cacheSeconds(300), async (req: Request, res: Response) => {
+router.get('/rss_prmoph', async (req: Request, res: Response) => {
+// router.get('/rss_prmoph', routeCache.cacheSeconds(300), async (req: Request, res: Response) => {
   try {
     const id = req.query.id;
     const rs: any = await prModel.getPR(id);
