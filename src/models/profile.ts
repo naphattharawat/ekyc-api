@@ -1,5 +1,5 @@
 const request = require('request');
-
+var isJSON = require('is-json');
 export class ProfileModel {
 
   getProfile(token: String) {
@@ -17,7 +17,11 @@ export class ProfileModel {
         if (error) {
           reject(error)
         } else {
-          resolve(JSON.parse(body))
+          if (isJSON(body)) {
+            resolve(JSON.parse(body))
+          } else {
+            reject({ ok: false })
+          }
         }
         // console.log(body);
       });
@@ -26,12 +30,12 @@ export class ProfileModel {
 
   getDipchip(db, sessionId) {
     return db('dipchip_sessions')
-      .select('cid','session_id')
+      .select('cid', 'session_id')
       .where({
         'session_id': sessionId
       });
   }
-  
+
   saveDipchip(db, data) {
     return db('dipchip_sessions').insert(data);
   }

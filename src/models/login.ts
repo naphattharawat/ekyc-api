@@ -1,5 +1,5 @@
 const request = require('request');
-
+var isJSON = require('is-json');
 export class LoginModel {
 
   login(username: String, password: String) {
@@ -67,7 +67,11 @@ export class LoginModel {
         if (error) {
           reject(error)
         } else {
-          resolve(JSON.parse(body))
+          if (isJSON(body)) {
+            resolve(JSON.parse(body))
+          } else {
+            reject({ ok: false })
+          }
         }
         // console.log(body);
       });
