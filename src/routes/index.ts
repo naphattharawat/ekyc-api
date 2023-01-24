@@ -18,10 +18,10 @@ const profileModel = new ProfileModel();
 var FCM = require('fcm-node');
 var cron = require('node-cron');
 
-cron.schedule('0 * * * *', (req: Request, res: Response) => {
-  console.log('running a task every hours');
-  getRSSPH(req.db);
-});
+// cron.schedule('0 * * * *', (req: Request, res: Response) => {
+//   console.log('running a task every hours');
+//   getRSSPH(req.db);
+// });
 
 router.get('/', (req: Request, res: Response) => {
   console.log(req.query);
