@@ -16,7 +16,9 @@ router.get('/slip', async (req: Request, res: Response) => {
     const accessToken = req.query.accessToken;
     const yy = req.query.yy;
     const mm = req.query.mm;
+    console.time('getSlip');
     const rs: any = await paySlipModel.getSlip(accessToken, yy, mm);
+    console.timeEnd('getSlip');
     res.send(rs);
   } catch (error) {
     res.status(HttpStatus.BAD_GATEWAY);
