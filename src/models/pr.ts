@@ -25,11 +25,11 @@ export class PrModel {
     })
   }
 
-  getPRDB(db: Knex, id) {
+  getPRDB(db: any, id) {
     return db('rss_moph').where('id', id);
   }
 
-  updatePRDB(db: Knex, id, data) {
+  updatePRDB(db: any, id, data) {
     return db('rss_moph').where('id', id).update('data', data);
   }
 

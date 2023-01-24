@@ -11,8 +11,7 @@ import * as HttpStatus from 'http-status-codes';
 import * as express from 'express';
 import * as cors from 'cors';
 
-import Knex = require('knex');
-import { MySqlConnectionConfig } from 'knex';
+// import Knex = require('knex');
 import { Router, Request, Response, NextFunction } from 'express';
 import { Jwt } from './models/jwt';
 
@@ -47,7 +46,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.use(cors());
 
-let connection: MySqlConnectionConfig = {
+let connection: any = {
   host: process.env.DB_HOST,
   port: +process.env.DB_PORT,
   database: process.env.DB_NAME,
@@ -57,7 +56,7 @@ let connection: MySqlConnectionConfig = {
   debug: false
 }
 
-let db = Knex({
+let db = require('knex')({
   client: 'mysql',
   connection: connection,
   pool: {
