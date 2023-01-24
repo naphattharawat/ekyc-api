@@ -1,5 +1,7 @@
 const request = require('request');
 var isJSON = require('is-json');
+var axios = require("axios").default;
+
 export class ProfileModel {
 
   getProfile(token: String) {
@@ -13,17 +15,10 @@ export class ProfileModel {
       }
     };
     return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject(error)
-        } else {
-          if (isJSON(body)) {
-            resolve(JSON.parse(body))
-          } else {
-            reject({ ok: false })
-          }
-        }
-        // console.log(body);
+      axios.request(options).then(function (response) {
+        resolve(response.data)
+      }).catch(function (error) {
+        reject(error)
       });
     });
   }
