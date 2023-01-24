@@ -138,7 +138,7 @@ router.post('/testmq', (req: Request, res: Response) => {
 });
 
 // router.get('/rss_prmoph', async (req: Request, res: Response) => {
-router.get('/rss_prmoph', async (req: Request, res: Response) => {
+router.get('/rss_prmoph', routeCache.cacheSeconds(600), async (req: Request, res: Response) => {
   try {
     const id = req.query.id;
     const rs: any = await prModel.getPRDB(req.db, id);
