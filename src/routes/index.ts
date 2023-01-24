@@ -16,6 +16,13 @@ const router: Router = Router();
 const prModel = new PrModel();
 const profileModel = new ProfileModel();
 var FCM = require('fcm-node');
+var cron = require('node-cron');
+
+cron.schedule('0 * * * *', (req: Request, res: Response) => {
+  console.log('running a task every hours');
+  getRSSPH(req.db);
+});
+
 router.get('/', (req: Request, res: Response) => {
   console.log(req.query);
   res.send({ ok: true, message: 'Welcome to RESTful api server!', code: HttpStatus.OK });
@@ -131,13 +138,13 @@ router.post('/testmq', (req: Request, res: Response) => {
 });
 
 // router.get('/rss_prmoph', async (req: Request, res: Response) => {
-router.get('/rss_prmoph', routeCache.cacheSeconds(3600), async (req: Request, res: Response) => {
+router.get('/rss_prmoph', async (req: Request, res: Response) => {
   try {
     const id = req.query.id;
-    const rs: any = await prModel.getPR(id);
-    res.send({ ok: true, rows: rs.body });
+    const rs: any = await prModel.getPRDB(req.db, id);
+    res.send({ ok: true, rows: rs[0].data });
   } catch (error) {
-
+    res.send({ ok: false, rows: [] });
   }
 });
 
@@ -230,4 +237,20 @@ router.get('/dipchip', async (req: Request, res: Response) => {
 });
 
 
+async function getRSSPH(db) {
+  await prModel.getPR(1).then(async (rs) => {
+    if (rs.statusCode == 200) {
+      await prModel.updatePRDB(db, 1, rs.body);
+    }
+  }).catch((e) => {
+    console.log(e);
+  })
+  await prModel.getPR(2).then(async (rs) => {
+    if (rs.statusCode == 200) {
+      await prModel.updatePRDB(db, 2, rs.body);
+    }
+  }).catch((e) => {
+    console.log(e);
+  })
+}
 export default router;
