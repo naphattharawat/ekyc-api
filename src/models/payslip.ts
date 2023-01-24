@@ -1,5 +1,6 @@
 const request = require('request');
-
+var isJSON = require('is-json');
+var axios = require("axios").default;
 export class PaySlipModel {
 
     getSlip(accessToken, yy, mm) {
@@ -13,20 +14,18 @@ export class PaySlipModel {
                 }
             };
             return new Promise<void>((resolve, reject) => {
-                request(options, function (error, response, body) {
-                    if (error) {
-                        reject(error)
+                axios.request(options).then(function (response) {
+                    if (response.status == 200) {
+                        resolve(response.data)
                     } else {
-                        try {
-                            resolve(JSON.parse(body))
-                        } catch (error) {
-                            reject(error)
-                        }
+                        reject({ ok: false })
                     }
+                }).catch(function (error) {
+                    reject(error)
                 });
             });
         } catch (error) {
-            return [];
+            return ({ ok: false,error:error });
         }
     }
 
@@ -41,21 +40,19 @@ export class PaySlipModel {
                 }
             };
             return new Promise<void>((resolve, reject) => {
-                request(options, function (error, response, body) {
-                    if (error) {
-                        reject(error)
+                axios.request(options).then(function (response) {
+                    if (response.status == 200) {
+                        resolve(response.data)
                     } else {
-                        try {
-                            resolve(JSON.parse(body))
-                        } catch (error) {
-                            reject(error)
-                        }
+                        reject({ ok: false })
                     }
+                }).catch(function (error) {
+                    reject(error)
                 });
             });
 
         } catch (error) {
-            return [];
+            return ({ ok: false,error:error });
         }
     }
 
