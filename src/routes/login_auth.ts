@@ -93,7 +93,7 @@ router.post('/v2', async (req: Request, res: Response) => {
 
 router.get('/app', async (req: Request, res: Response) => {
   try {
-    let appId: string = req.query.appId;
+    let appId: any = req.query.appId;
     if (appId) {
       const rs: any = await loginModel.getApp(req.db, appId);
       res.send({ ok: true, rows: rs });
