@@ -15,11 +15,15 @@ export class LoginModel {
         password: password
       }
     };
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<any>((resolve, reject) => {
       axios(options).then(function (response) {
-        resolve(response.data);
+        resolve({ statusCode: response.status, body: response.data });
       }).catch(function (error) {
-        reject(error.response.data)
+        if (error.response) {
+          resolve({ statusCode: error.response.status, error: error.response.data });
+        } else {
+          resolve({ statusCode: error.response.status, error: error.response.data });
+        }
       });
     });
   }
