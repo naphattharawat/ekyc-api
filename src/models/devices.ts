@@ -1,6 +1,6 @@
 import Knex = require("knex");
 
-const request = require('request');
+
 
 export class DeviceModel {
 

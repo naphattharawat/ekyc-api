@@ -276,7 +276,7 @@ router.post('/payslip', async (req: Request, res: Response) => {
           'exp10': i.exp10,
           'sumpay': i.sumpay,
           'sumnet': i.sumnet,
-          'daykey': moment(i.daykey, 'YYYY-MM-DD').isValid() ? moment(i.daykey, 'YYYY-MM-DD').format('YYYY-MM-DD') : null,
+          'daykey': i.daykey,
           'money4txt': i.money4txt,
           'money5txt': i.money5txt,
           'money6txt': i.money6txt,

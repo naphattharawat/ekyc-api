@@ -1,4 +1,4 @@
-const request = require('request');
+
 
 export class LogoutModel {
 

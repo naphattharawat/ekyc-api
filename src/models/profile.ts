@@ -1,4 +1,4 @@
-const request = require('request');
+
 var isJSON = require('is-json');
 var axios = require("axios").default;
 

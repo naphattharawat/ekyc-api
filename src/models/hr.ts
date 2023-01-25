@@ -1,14 +1,13 @@
 import { Jwt } from './jwt';
+import axios from 'axios';
 import e = require("express");
 var isJSON = require('is-json');
-const request = require('request');
+
 const moment = require('moment');
 const jwtModel = new Jwt();
 export class HrModel {
 
     authen() {
-
-
         var options = {
             'method': 'POST',
             'url': 'http://203.157.102.224/auth/create-token',
@@ -17,23 +16,12 @@ export class HrModel {
             }
         };
         return new Promise<void>((resolve, reject) => {
-            try {
-                request(options, function (error, response, body) {
-                    if (error) {
-                        reject(error)
-                    } else {
-                        if (isJSON(body)) {
-                            resolve(JSON.parse(body))
-                        } else {
-                            reject({ ok: false })
-                        }
-                    }
-                });
-            } catch (error) {
+            axios(options).then(function (response) {
+                resolve(response.data);
+            }).catch(function (error) {
                 reject(error)
-            }
+            });
         });
-
 
     }
 
@@ -46,16 +34,10 @@ export class HrModel {
             }
         };
         return new Promise<void>((resolve, reject) => {
-            request(options, function (error, response, body) {
-                if (error) {
-                    reject(error)
-                } else {
-                    if (isJSON(body)) {
-                        resolve(JSON.parse(body))
-                    } else {
-                        reject({ ok: false })
-                    }
-                }
+            axios(options).then(function (response) {
+                resolve(response.data);
+            }).catch(function (error) {
+                reject(error)
             });
         });
     }
@@ -104,16 +86,10 @@ export class HrModel {
             }
         };
         return new Promise<void>((resolve, reject) => {
-            request(options, function (error, response, body) {
-                if (error) {
-                    reject(error)
-                } else {
-                    if (isJSON(body)) {
-                        resolve(JSON.parse(body))
-                    } else {
-                        reject({ ok: false })
-                    }
-                }
+            axios(options).then(function (response) {
+                resolve(response.data);
+            }).catch(function (error) {
+                reject(error)
             });
         });
     }

@@ -1,8 +1,6 @@
-const request = require('request');
-import { KnexExtendModel } from './knexExtend';
+
 var isJSON = require('is-json');
 var axios = require("axios").default;
-const knexExtendModel: KnexExtendModel = new KnexExtendModel();
 export class PaySlipModel {
 
     getSlip(accessToken, yy, mm) {
@@ -60,6 +58,17 @@ export class PaySlipModel {
 
     savePayslip(db: any, data) {
         return db('payslip').insert(data).onConflict('nauto').merge()
+    }
+
+    getDBSlips(db, cid) {
+        return db('payslip').where('idno', cid).select('yy', 'mm', 'daypay', 'notes', 'money1', 'sumnet', 'sumpay');
+    }
+
+    getDBSlipMonth(db, cid, yy, mm) {
+        return db('payslip')
+            .where('idno', cid)
+            .where('yy', yy)
+            .where('mm', mm)
     }
 
 

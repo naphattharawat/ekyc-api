@@ -1,5 +1,8 @@
-const request = require('request');
+
 const fs = require('fs');
+import axios from 'axios';
+const FormData = require('form-data');
+
 export class RegisterModel {
 
   register(data) {
@@ -7,7 +10,7 @@ export class RegisterModel {
       method: 'POST',
       url: 'https://members.moph.go.th/api/v1/m/register',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      form: {
+      data: {
         cid: data.cid,
         first_name: data.first_name,
         last_name: data.last_name,
@@ -17,13 +20,10 @@ export class RegisterModel {
       }
     };
     return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(JSON.parse(body))
-        }
-        // console.log(body);
+      axios(options).then(function (response) {
+        resolve(response.data);
+      }).catch(function (error) {
+        reject(error)
       });
     });
   }
@@ -36,25 +36,22 @@ export class RegisterModel {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
       },
-      body: {
+      data: {
         cid: data.cid,
         first_name: data.first_name,
         last_name: data.last_name,
         session_id: data.session_id
-      },
-      json: true
+      }
     };
     return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject(error)
-        } else {
-          // console.log(body);
-          resolve(body)
-        }
+      axios(options).then(function (response) {
+        resolve(response.data);
+      }).catch(function (error) {
+        reject(error)
       });
     });
   }
+
   verifyKycV2(data) {
     const options = {
       method: 'POST',
@@ -62,55 +59,42 @@ export class RegisterModel {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: {
+      data: {
         cid: data.cid,
         first_name: data.first_name,
         last_name: data.last_name,
         session_id: data.session_id
-      },
-      json: true
+      }
     };
     return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject(error)
-        } else {
-          // console.log(body);
-          resolve(body)
-        }
+      axios(options).then(function (response) {
+        resolve(response.data);
+      }).catch(function (error) {
+        reject(error)
       });
     });
   }
 
   verifyKycDipchip(data) {
-
     const options = {
       method: 'POST',
       url: 'https://members.moph.go.th/api/v1/m/is_dipchip',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: {
+      data: {
         cid: data.cid,
         first_name: data.first_name,
         last_name: data.last_name,
         session_id: data.session_id
-      },
-      json: true
+      }
     };
     return new Promise<void>((resolve, reject) => {
-      try {
-        request(options, function (error, response, body) {
-          if (error) {
-            reject(error)
-          } else {
-            // console.log(body);
-            resolve(body)
-          }
-        });
-      } catch (error) {
+      axios(options).then(function (response) {
+        resolve(response.data);
+      }).catch(function (error) {
         reject(error)
-      }
+      });
     });
   }
 
@@ -122,17 +106,19 @@ export class RegisterModel {
       headers: { apiKey: key, 'Content-Type': 'application/json' }
     };
     return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(JSON.parse(body));
-        }
+      axios(options).then(function (response) {
+        resolve(response.data);
+      }).catch(function (error) {
+        // console.error(error);
+        reject(error)
       });
     });
 
   }
   ekycFace(sessionId, filePath, type) {
+    const form = new FormData();
+    form.append('documentType', type);
+    form.append('file', fs.createReadStream(filePath), filePath);
     const key = process.env.ekyc_appId;
     const options = {
       method: 'POST',
@@ -141,28 +127,23 @@ export class RegisterModel {
         apiKey: key,
         'Content-Type': 'multipart/form-data'
       },
-      formData: {
-        documentType: type,
-        file: {
-          value: fs.createReadStream(filePath),
-          options: { filename: filePath, contentType: null }
-        }
-      }
+      data: form
     };
     return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject(error)
-        } else {
-          const rep = JSON.parse(body);
-          rep.statusCode = response.statusCode;
-          resolve(rep);
-        }
+      axios(options).then(function (response) {
+        response.data.statusCode = response.status;
+        resolve(response.data);
+      }).catch(function (error) {
+        // console.error(error);
+        reject(error)
       });
     })
   }
 
   ekycManaual(sessionId, filePath, type) {
+    const form = new FormData();
+    form.append('documentType', type);
+    form.append('file', fs.createReadStream(filePath), filePath);
     const key = process.env.ekyc_appId;
     const options = {
       method: 'POST',
@@ -171,23 +152,15 @@ export class RegisterModel {
         apiKey: key,
         'Content-Type': 'multipart/form-data'
       },
-      formData: {
-        documentType: type,
-        file: {
-          value: fs.createReadStream(filePath),
-          options: { filename: filePath, contentType: null }
-        }
-      }
+      data: form
     };
     return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject(error)
-        } else {
-          const rep = JSON.parse(body);
-          rep.statusCode = response.statusCode;
-          resolve(rep);
-        }
+      axios(options).then(function (response) {
+        response.data.statusCode = response.status;
+        resolve(response.data);
+      }).catch(function (error) {
+        // console.error(error);
+        reject(error)
       });
     })
   }
@@ -201,21 +174,18 @@ export class RegisterModel {
         apiKey: key,
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      form: { updateType: 'Complete' }
+      data: { updateType: 'Complete' }
     };
     return new Promise<any>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject({ statusCode: response.statusCode, error: error });
-        } else {
-          resolve({ statusCode: response.statusCode, body: JSON.parse(body) });
-        }
+      axios(options).then(function (response) {
+        resolve({ statusCode: response.status, body: response.data });
+      }).catch(function (error) {
+        reject({ statusCode: error.status, error: error });
       });
     })
   }
-  ekycEditData(sessionId, cid, fname, lname, dob, laser) {
-    console.log(sessionId, cid, fname, lname, dob, laser);
 
+  ekycEditData(sessionId, cid, fname, lname, dob, laser) {
     const key = process.env.ekyc_appId;
     const options = {
       method: 'POST',
@@ -224,22 +194,19 @@ export class RegisterModel {
         apiKey: key,
         'Content-Type': 'application/json'
       },
-      body: {
+      data: {
         "idNumber": cid,
         "firstNameTh": fname,
         "lastNameTh": lname,
         "dateOfBirth": dob,
         "laserCode": laser
-      },
-      json: true
+      }
     };
     return new Promise<any>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject({ statusCode: response.statusCode, error: error });
-        } else {
-          resolve({ statusCode: response.statusCode, body: body });
-        }
+      axios(options).then(function (response) {
+        resolve({ statusCode: response.status, body: response.data });
+      }).catch(function (error) {
+        reject({ statusCode: error.status, error: error });
       });
     })
   }
@@ -254,12 +221,10 @@ export class RegisterModel {
       },
     };
     return new Promise<any>((resolve, reject) => {
-      request(options, function (error, response, body: any) {
-        if (error) {
-          reject({ statusCode: response.statusCode, error: error });
-        } else {
-          resolve({ statusCode: response.statusCode, body: JSON.parse(body) });
-        }
+      axios(options).then(function (response) {
+        resolve({ statusCode: response.status, body: response.data });
+      }).catch(function (error) {
+        reject({ statusCode: error.status, error: error });
       });
     })
 
@@ -275,12 +240,11 @@ export class RegisterModel {
       }
     };
     return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(JSON.parse(body));
-        }
+      axios(options).then(function (response) {
+        resolve(response.data);
+      }).catch(function (error) {
+        // console.error(error);
+        reject(error)
       });
     })
 
@@ -353,20 +317,16 @@ export class RegisterModel {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: {
+      data: {
         password: password,
         passwordConf: passwordConf
-      },
-      json: true
+      }
     };
     return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(body)
-        }
-        // console.log(body);
+      axios(options).then(function (response) {
+        resolve(response.data);
+      }).catch(function (error) {
+        reject(error)
       });
     });
   }
@@ -378,19 +338,15 @@ export class RegisterModel {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: {
+      data: {
         email: email
-      },
-      json: true
+      }
     };
     return new Promise<void>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(body)
-        }
-        // console.log(body);
+      axios(options).then(function (response) {
+        resolve(response.data);
+      }).catch(function (error) {
+        reject(error)
       });
     });
   }

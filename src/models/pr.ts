@@ -1,6 +1,7 @@
 import Knex = require("knex");
+import axios from 'axios';
 
-const request = require('request');
+
 
 export class PrModel {
 
@@ -15,12 +16,10 @@ export class PrModel {
       json: true
     };
     return new Promise<any>((resolve, reject) => {
-      request(options, function (error, response, body) {
-        if (error) {
-          reject({ statusCode: response.statusCode, error: error });
-        } else {
-          resolve({ statusCode: response.statusCode, body: body });
-        }
+      axios(options).then(function (response) {
+        resolve({ statusCode: response.status, body: response.data });
+      }).catch(function (error) {
+        reject({ statusCode: error.status, error: error });
       });
     })
   }

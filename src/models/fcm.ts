@@ -1,6 +1,6 @@
 import { Jwt } from './jwt';
 var FCM = require('fcm-node');
-const request = require('request');
+
 const moment = require('moment');
 const jwtModel = new Jwt();
 export class FcmModel {
