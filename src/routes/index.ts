@@ -1,3 +1,4 @@
+import { PaySlipModel } from './../models/payslip';
 import { ProfileModel } from './../models/profile';
 import { FcmModel } from './../models/fcm';
 import { PrModel } from './../models/pr';
@@ -8,6 +9,7 @@ import { Jwt } from '../models/jwt';
 var routeCache = require('route-cache');
 
 import * as HttpStatus from 'http-status-codes';
+import e = require('express');
 
 const jwt = new Jwt();
 const registerModel = new RegisterModel();
@@ -15,6 +17,7 @@ const fcmModel = new FcmModel();
 const router: Router = Router();
 const prModel = new PrModel();
 const profileModel = new ProfileModel();
+const paySlipModel = new PaySlipModel();
 var FCM = require('fcm-node');
 var cron = require('node-cron');
 
@@ -236,21 +239,21 @@ router.get('/dipchip', async (req: Request, res: Response) => {
   }
 });
 
+router.post('/payslip', async (req: Request, res: Response) => {
+  try {
+    const key = req.body.key;
+    const data = req.body.data;
+    if (key == 'AX124') {
+      const rs: any = await paySlipModel.savePayslip(req.db, data)
+      res.send({ ok: true })
+    } else {
+      res.send({ ok: false })
+    }
+  } catch (error) {
+    res.send({ ok: false, error: error });
+  }
+});
 
-async function getRSSPH(db) {
-  await prModel.getPR(1).then(async (rs) => {
-    if (rs.statusCode == 200) {
-      await prModel.updatePRDB(db, 1, rs.body);
-    }
-  }).catch((e) => {
-    console.log(e);
-  })
-  await prModel.getPR(2).then(async (rs) => {
-    if (rs.statusCode == 200) {
-      await prModel.updatePRDB(db, 2, rs.body);
-    }
-  }).catch((e) => {
-    console.log(e);
-  })
-}
+
+
 export default router;
