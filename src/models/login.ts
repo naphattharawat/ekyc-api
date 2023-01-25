@@ -19,7 +19,7 @@ export class LoginModel {
       axios(options).then(function (response) {
         resolve(response.data);
       }).catch(function (error) {
-        reject(error)
+        reject(error.response.data)
       });
     });
   }
