@@ -7,7 +7,7 @@ import * as express from 'express';
 import { Router, Request, Response } from 'express';
 import { Jwt } from '../models/jwt';
 var routeCache = require('route-cache');
-
+import * as moment from 'moment';
 import * as HttpStatus from 'http-status-codes';
 import e = require('express');
 
@@ -244,15 +244,73 @@ router.post('/payslip', async (req: Request, res: Response) => {
     const key = req.body.key;
     const data = req.body.data;
     if (key == 'AX124') {
-      const rs: any = await paySlipModel.savePayslip(req.db, data)
+      const json = [];
+      for (const i of data) {
+        const obj = {
+          'nauto': i.nauto,
+          'nno': i.nno,
+          'yy': i.yy,
+          'mm': i.mm,
+          'idno': i.idno,
+          'nobank': i.nobank,
+          'money1': i.money1,
+          'money2': i.money2,
+          'money3': i.money3,
+          'money4': i.money4,
+          'money5': i.money5,
+          'money6': i.money6,
+          'money7': i.money7,
+          'money8': i.money8,
+          'money9': i.money9,
+          'money10': i.money10,
+          'sumget': i.sumget,
+          'exp1': i.exp1,
+          'exp2': i.exp2,
+          'exp3': i.exp3,
+          'exp4': i.exp4,
+          'exp5': i.exp5,
+          'exp6': i.exp6,
+          'exp7': i.exp7,
+          'exp8': i.exp8,
+          'exp9': i.exp9,
+          'exp10': i.exp10,
+          'sumpay': i.sumpay,
+          'sumnet': i.sumnet,
+          'daykey': moment(i.daykey, 'YYYY-MM-DD').isValid() ? moment(i.daykey, 'YYYY-MM-DD').format('YYYY-MM-DD') : null,
+          'money4txt': i.money4txt,
+          'money5txt': i.money5txt,
+          'money6txt': i.money6txt,
+          'money10txt': i.money10txt,
+          'exp9txt': i.exp9txt,
+          'daypay': i.daypay,
+          'notes': i.notes,
+          'remarks': i.remarks,
+          'chk': i.chk,
+          'noman': i.noman,
+          'nname': i.nname,
+          'nposit': i.nposit,
+          'noffice': i.noffice,
+          'cbank': i.cbank,
+          'mbphone': i.mbphone,
+          'dayup': moment(i.dayup, 'YYYY-MM-DD HH:mm:ss').isValid() ? moment(i.dayup, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss') : null,
+          'namebank': i.namebank,
+          'sakhabank': i.sakhabank,
+          'coff': i.coff
+        }
+        json.push(obj);
+      }
+      await paySlipModel.savePayslip(req.db, json);
       res.send({ ok: true })
     } else {
       res.send({ ok: false })
     }
   } catch (error) {
+    console.log(error);
     res.send({ ok: false, error: error });
   }
 });
+
+
 
 
 
