@@ -22,7 +22,7 @@ export class LoginModel {
         if (error.response) {
           resolve({ statusCode: error.response.status, error: error.response.data });
         } else {
-          resolve({ statusCode: error.response.status, error: error.response.data });
+          resolve({ statusCode: error.status, error: error.message });
         }
       });
     });
