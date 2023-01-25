@@ -117,7 +117,7 @@ router.post('/v2', async (req: Request, res: Response) => {
       }
     } else {
       res.status(rs.statusCode)
-      res.send({ ok: false, error: rs.error });
+      res.send({ ok: false, error: rs.error.error, message: rs.error.message });
     }
   } catch (error) {
     res.status(502);
