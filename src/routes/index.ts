@@ -10,6 +10,8 @@ var routeCache = require('route-cache');
 import * as moment from 'moment';
 import * as HttpStatus from 'http-status-codes';
 import e = require('express');
+var generator = require('generate-password');
+
 
 const jwt = new Jwt();
 const registerModel = new RegisterModel();
@@ -38,36 +40,28 @@ router.get('/privacy', (req: Request, res: Response) => {
 
 router.post('/ekyc', async (req: Request, res: Response) => {
   const body = req.body;
-  const client = req.mqttClient;
   let accessToken;
   // {
   //   success: 'อนุมัติ',
   //   sessionId: '2c050c38-fef2-4ef6-b8fc-cf225776f23c',
   //   message: 'session 2c050c38-fef2-4ef6-b8fc-cf225776f23c ทำการยืนยันเสร็จสิ้น'
   // }
-  console.log(body);
   if (body.sessionId) {
     const rs: any = await registerModel.ekycGetResult(body.sessionId);
     if (rs.statusCode == 200) {
       if (rs.body.idCardDopaPassed && rs.body.faceVerificationPassed) {
         const info: any = await registerModel.getUser(req.db, rs.body.idCardNumber);
-        console.log(rs.body);
-        console.log(info[0]);
-
         if (info[0].sessions_id == body.sessionId) {
 
           const device: any = await registerModel.getDevice(req.db, rs.body.idCardNumber);
-
-
           const obj: any = {
             cid: info[0].cid,
             first_name: info[0].first_name,
             last_name: info[0].last_name,
-            session_id: body.sessionId
+            session_id: body.sessionId,
+            password_internet: info[0].password_internet
           }
           const vf: any = await registerModel.verifyKycV2(obj);
-          console.log(vf);
-
           if (vf.ok) {
             // mqtt
             for (const d of device) {
@@ -78,6 +72,18 @@ router.post('/ekyc', async (req: Request, res: Response) => {
               // client.publish(topic, '{"topic":"KYC","status":true}');
             }
             await registerModel.updateKYC(req.db, body.sessionId);
+            try {
+              await registerModel.generateUserInternet({
+                "firstName": info[0].first_name,
+                "lastName": info[0].last_name,
+                "password": info[0].password_internet,
+                "cid": info[0].cid,
+                "email": info[0].email,
+                "type": "MYMOPH"
+              });
+            } catch (error) {
+              console.log(error);
+            }
             res.send({ ok: true });
           } else {
             res.send({ ok: false, error: 'update member ไม่ได้' });
@@ -182,13 +188,14 @@ router.post('/dipchip', async (req: Request, res: Response) => {
         const insert = await profileModel.saveDipchip(req.db, {
           cid, session_id: newSessionId
         })
-
+        const info: any = await registerModel.getUser(req.db, rs.cid);
         // send ISKYC;
         const rsDC: any = await registerModel.verifyKycDipchip({
           cid: cid,
           first_name: fname,
           last_name: lname,
-          session_id: newSessionId
+          session_id: newSessionId,
+          password_internet: info[0].password_internet
         });
 
         if (rsDC.ok) {
@@ -198,6 +205,18 @@ router.post('/dipchip', async (req: Request, res: Response) => {
             // client.publish(topic, '{"topic":"KYC","status":true}');
           }
           await registerModel.updateKYCDip(req.db, newSessionId, cid);
+          try {
+            await registerModel.generateUserInternet({
+              "firstName": fname,
+              "lastName": lname,
+              "password": info[0].password_internet,
+              "cid": info[0].cid,
+              "email": info[0].email,
+              "type": "MYMOPH"
+            });
+          } catch (error) {
+            console.log(error);
+          }
           res.send({ ok: true });
         } else {
           console.log(rsDC);

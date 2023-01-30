@@ -10,3 +10,4 @@ app/*
 .idea
 .env
 uploads
+package-lock.json

@@ -8,7 +8,7 @@ import * as fse from 'fs-extra';
 import * as multer from 'multer';
 import * as express from 'express';
 import { Router, Request, Response } from 'express';
-
+var generator = require('generate-password');
 import { RegisterModel } from '../models/register';
 
 const registerModel = new RegisterModel();
@@ -69,11 +69,16 @@ router.post('/', async (req: Request, res: Response) => {
         password: password,
         email: email
       }
+      const passwordInternet = await generator.generate({
+        length: 20,
+        numbers: true
+      });
       const rs: any = await registerModel.register(obj);
       if (rs.ok) {
         await registerModel.insertCidEmailProfile(req.db,
           cid,
-          email
+          email,
+          passwordInternet
         );
         res.send({ ok: true, code: HttpStatus.OK });
       } else {
@@ -189,7 +194,7 @@ router.post('/ekyc/face', upload.any(), async (req: Request, res: Response) => {
     const sessionId = req.body.sessionId;
     if (req.files.length) {
       const filePath = req.files[0].path || null;
-      const rs: any = await registerModel.ekycFace(sessionId, filePath, 'face');      
+      const rs: any = await registerModel.ekycFace(sessionId, filePath, 'face');
       if (rs.statusCode == 200) {
         res.send({ ok: true, message: rs.message })
       } else {

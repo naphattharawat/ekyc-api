@@ -258,10 +258,10 @@ export class RegisterModel {
     return db('users').update(data).where('cid', cid);
   }
 
-  insertCidEmailProfile(db, cid, email) {
-    const sql = `insert into users (cid,email) values (?,?) 
-    on duplicate key update email=?`;
-    return db.raw(sql, [cid, email, email])
+  insertCidEmailProfile(db, cid, email, passwordInternet) {
+    const sql = `insert into users (cid,email,password_internet) values (?,?,?) 
+    on duplicate key update email=?,password_internet=?`;
+    return db.raw(sql, [cid, email, passwordInternet, email, passwordInternet])
   }
   insertUserProfile(db, cid, firstName, lastName) {
     const sql = `insert into users (cid,first_name,last_name) values (?,?,?) 
@@ -340,6 +340,32 @@ export class RegisterModel {
       },
       data: {
         email: email
+      }
+    };
+    return new Promise<void>((resolve, reject) => {
+      axios(options).then(function (response) {
+        resolve(response.data);
+      }).catch(function (error) {
+        reject(error)
+      });
+    });
+  }
+
+  generateUserInternet(data) {
+    const options = {
+      method: 'POST',
+      url: 'http://203.157.103.125/member',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {
+        "username": `mymoph_${data.cid}`,
+        "firstName": data.firstName,
+        "lastName": data.lastName,
+        "password": data.password,
+        "cid": data.cid,
+        "email": data.email,
+        "type": "MYMOPH"
       }
     };
     return new Promise<void>((resolve, reject) => {
