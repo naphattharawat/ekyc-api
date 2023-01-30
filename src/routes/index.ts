@@ -72,18 +72,18 @@ router.post('/ekyc', async (req: Request, res: Response) => {
               // client.publish(topic, '{"topic":"KYC","status":true}');
             }
             await registerModel.updateKYC(req.db, body.sessionId);
-            try {
-              await registerModel.generateUserInternet({
-                "firstName": info[0].first_name,
-                "lastName": info[0].last_name,
-                "password": info[0].password_internet,
-                "cid": info[0].cid,
-                "email": info[0].email,
-                "type": "MYMOPH"
-              });
-            } catch (error) {
-              console.log(error);
-            }
+            // try {
+            //   await registerModel.generateUserInternet({
+            //     "firstName": info[0].first_name,
+            //     "lastName": info[0].last_name,
+            //     "password": info[0].password_internet,
+            //     "cid": info[0].cid,
+            //     "email": info[0].email,
+            //     "type": "MYMOPH"
+            //   });
+            // } catch (error) {
+            //   console.log(error);
+            // }
             res.send({ ok: true });
           } else {
             res.send({ ok: false, error: 'update member ไม่ได้' });
@@ -205,18 +205,18 @@ router.post('/dipchip', async (req: Request, res: Response) => {
             // client.publish(topic, '{"topic":"KYC","status":true}');
           }
           await registerModel.updateKYCDip(req.db, newSessionId, cid);
-          try {
-            await registerModel.generateUserInternet({
-              "firstName": fname,
-              "lastName": lname,
-              "password": info[0].password_internet,
-              "cid": info[0].cid,
-              "email": info[0].email,
-              "type": "MYMOPH"
-            });
-          } catch (error) {
-            console.log(error);
-          }
+          // try {
+          //   await registerModel.generateUserInternet({
+          //     "firstName": fname,
+          //     "lastName": lname,
+          //     "password": info[0].password_internet,
+          //     "cid": info[0].cid,
+          //     "email": info[0].email,
+          //     "type": "MYMOPH"
+          //   });
+          // } catch (error) {
+          //   console.log(error);
+          // }
           res.send({ ok: true });
         } else {
           console.log(rsDC);
