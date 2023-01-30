@@ -16,6 +16,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { Jwt } from './models/jwt';
 
 import indexRoute from './routes/index';
+import mymophWebRoute from './routes/mymoph-web';
 import loginRoute from './routes/login';
 import logoutRoute from './routes/logout';
 import loginAuthRoute from './routes/login_auth';
@@ -144,6 +145,7 @@ app.use('/sessions', checkAuth, sessionsRoute);
 app.use('/payslips', checkAuth, payslipRoute);
 app.use('/hr', checkAuth, hrRoute);
 app.use('/register', registerRoute);
+app.use('/web/api', mymophWebRoute);
 app.use('/', indexRoute);
 
 //error handlers
