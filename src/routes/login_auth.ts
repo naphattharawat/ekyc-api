@@ -91,6 +91,31 @@ router.post('/v2', async (req: Request, res: Response) => {
   }
 });
 
+router.post('/fast', async (req: Request, res: Response) => {
+  try {
+    let deviceInfo: any = req.body.deviceInfo;
+    let cid: string = req.body.cid;
+    const data: any = {};
+    if (deviceInfo.deviceId && cid) {
+      await loginModel.saveLog(req.db, deviceInfo.deviceId, 'SHORT_LOGIN');
+      let token: any = {
+        device_id: deviceInfo.deviceId,
+        cid: cid
+      };
+      data.token = jwt.sign(token);
+      data.ok = true;
+      res.send(data);
+    } else {
+      res.status(401)
+      res.send({ ok: false, error: 'ไม่พบ deviceId และ cid' });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(HttpStatus.BAD_GATEWAY);
+    res.send({ ok: false, error: error.message });
+  }
+});
+
 router.get('/app', async (req: Request, res: Response) => {
   try {
     let appId: any = req.query.appId;
