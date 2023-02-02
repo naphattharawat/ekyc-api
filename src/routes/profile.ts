@@ -27,7 +27,6 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     let accessToken: any = req.query.accessToken;
     let rs: any = await profileModel.getProfile(accessToken);
-    console.log(rs);
     if (rs.cid) {
       res.send(rs);
     } else {

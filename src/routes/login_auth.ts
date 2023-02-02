@@ -97,6 +97,7 @@ router.post('/fast', async (req: Request, res: Response) => {
     let cid: string = req.body.cid;
     const data: any = {};
     if (deviceInfo.deviceId && cid) {
+      // const devices = await deviceModel.checkStatus(req.db,deviceInfo.deviceId);
       await loginModel.saveLog(req.db, deviceInfo.deviceId, 'SHORT_LOGIN');
       let token: any = {
         device_id: deviceInfo.deviceId,

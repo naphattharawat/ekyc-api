@@ -89,7 +89,9 @@ router.post('/v2', async (req: Request, res: Response) => {
             sdk: deviceInfo.sdk,
             model: deviceInfo.model,
             model_marketing: deviceInfo.modelMarketing,
-            brand: deviceInfo.brand
+            brand: deviceInfo.brand,
+            is_tablet: deviceInfo.isTaplet || 'N',
+            is_mobile: deviceInfo.isMobile || 'N',
           }
           await deviceModel.saveDeviceV2(req.db, obj);
           await loginModel.saveLog(req.db, deviceInfo.deviceId, 'LONG_LOGIN');

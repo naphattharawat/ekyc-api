@@ -32,5 +32,12 @@ export class DeviceModel {
     // return db('devices').insert(data);
   }
 
+  checkStatus(db: any, deviceId) {
+    return db('devices')
+      .select('device_id', 'cid', 'fcm_token')
+      .where('device_id', deviceId)
+      .where('status', 'ONLINE');
+  }
+
 }
 
