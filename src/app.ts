@@ -26,6 +26,7 @@ import sessionsRoute from './routes/sessions';
 import payslipRoute from './routes/payslip';
 import hrRoute from './routes/hr';
 import registerRoute from './routes/register';
+import wifiMophRoute from './routes/wifi-moph';
 
 // Assign router to the express.Router() instance
 const app: express.Application = express();
@@ -144,6 +145,7 @@ app.use('/profiles', checkAuth, profilesRoute);
 app.use('/sessions', checkAuth, sessionsRoute);
 app.use('/payslips', checkAuth, payslipRoute);
 app.use('/hr', checkAuth, hrRoute);
+app.use('/wifi-moph', checkAuth, wifiMophRoute);
 app.use('/register', registerRoute);
 app.use('/web/api', mymophWebRoute);
 app.use('/', indexRoute);
