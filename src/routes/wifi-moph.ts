@@ -39,6 +39,7 @@ router.post('/', async (req: Request, res: Response) => {
       res.send({ ok: false, error: 'Parameter not found' });
     }
   } catch (error) {
+    console.log(error);
     res.status(HttpStatus.BAD_GATEWAY);
     res.send({ ok: false, error: error.message });
   }
