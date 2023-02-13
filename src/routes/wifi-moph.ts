@@ -21,7 +21,7 @@ router.post('/', async (req: Request, res: Response) => {
     const macAddress = req.body.macAddress;
     const deviceId = req.body.deviceId;
     if (deviceId && macAddress) {
-      const info = wifiMophModel.findMacAddress(db, deviceId);
+      const info = await wifiMophModel.findMacAddress(db, deviceId);
       if (info.length) {
         await wifiMophModel.removeMacAddress(db, deviceId);
       }
