@@ -32,11 +32,19 @@ export class DeviceModel {
     // return db('devices').insert(data);
   }
 
-  checkStatus(db: any, deviceId) {
+  checkStatus(db: any, cid) {
     return db('devices')
       .select('device_id', 'cid', 'fcm_token')
-      .where('device_id', deviceId)
+      // .where('device_id', deviceId)
+      .where('cid', cid)
       .where('status', 'ONLINE');
+  }
+
+  changeStatusWithoutDeviceId(db: any, cid, deviceId) {
+    return db('devices')
+      .whereNot('device_id', deviceId)
+      .where('cid', cid)
+      .update('status', 'OFFLINE')
   }
 
 }

@@ -128,6 +128,66 @@ router.post('/v2', async (req: Request, res: Response) => {
   }
 });
 
+router.post('/v3', async (req: Request, res: Response) => {
+  try {
+    let username: string = req.body.username;
+    let password: string = req.body.password;
+    let deviceInfo: any = req.body.deviceInfo;
+    // let data: any = {};
+    let rs: any = await loginModel.login(username, password);
+    if (rs.statusCode == 200) {
+      if (rs.body.access_token) {
+        if (deviceInfo.deviceId) {
+          const obj: any = {
+            device_id: deviceInfo.deviceId,
+            cid: rs.body.cid,
+            fcm_token: deviceInfo.fcmToken,
+            os: deviceInfo.os,
+            version: deviceInfo.version,
+            phone_name: deviceInfo.phoneName,
+            sdk: deviceInfo.sdk,
+            model: deviceInfo.model,
+            model_marketing: deviceInfo.modelMarketing,
+            brand: deviceInfo.brand,
+            is_tablet: deviceInfo.isTaplet || 'N',
+            is_mobile: deviceInfo.isMobile || 'N',
+            app_version: deviceInfo.appVersion || null,
+          }
+          await deviceModel.changeStatusWithoutDeviceId(req.db, rs.body.cid, deviceInfo.deviceId);
+          await deviceModel.saveDeviceV2(req.db, obj);
+          await loginModel.saveLog(req.db, deviceInfo.deviceId, 'LONG_LOGIN');
+          let token: any = {
+            device_id: deviceInfo.deviceId,
+            cid: rs.body.cid
+          }
+          res.send({
+            ok: true,
+            token: jwt.sign(token),
+            oauth: {
+              access_token: rs.body.access_token,
+              cid: rs.body.cid,
+              refresh_token: rs.body.refresh_token,
+              expires_in: rs.body.expires_in
+            }
+          });
+        } else {
+          res.status(500)
+          res.send({ ok: false, error: rs.error, message: 'device not found' });
+        }
+      } else {
+        res.status(401)
+        res.send({ ok: false, error: rs.error, message: rs.body.message });
+      }
+    } else {
+      res.status(rs.statusCode)
+      res.send({ ok: false, error: rs.error.error, message: rs.error.message });
+    }
+  } catch (error) {
+    res.status(502);
+    res.send({ ok: false, error: error.message });
+  }
+});
+
 // mymoph://qr?clientId=xxxxx&token=xxxxx&sessionId=xxx
 router.post('/qr', async (req: Request, res: Response) => {
   try {

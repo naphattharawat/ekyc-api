@@ -3,7 +3,7 @@
 import { Router, Request, Response } from 'express';
 import * as HttpStatus from 'http-status-codes';
 import { DeviceModel } from '../models/devices';
-
+import * as _ from 'lodash';
 import { LoginModel } from '../models/login';
 
 import { Jwt } from '../models/jwt';
@@ -86,6 +86,63 @@ router.post('/v2', async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
 
+    res.status(HttpStatus.BAD_GATEWAY);
+    res.send({ ok: false, error: error.message });
+  }
+});
+
+router.post('/v3', async (req: Request, res: Response) => {
+  try {
+    let deviceInfo: any = req.body.deviceInfo;
+    let cid: string = req.body.cid;
+    const data: any = {};
+    const rs: any = await deviceModel.checkStatus(req.db, cid);
+    if (rs.length >= 1) {
+      if (rs.length > 1) {
+        await deviceModel.changeStatusWithoutDeviceId(req.db, cid, deviceInfo.deviceId)
+      }
+      if (deviceInfo.deviceId && cid) {
+        const idx = _.findIndex(rs, (w) => { return w.device_id == deviceInfo.deviceId });
+        if (idx > -1) {
+          const obj: any = {
+            device_id: deviceInfo.deviceId,
+            cid: cid,
+            fcm_token: deviceInfo.fcmToken,
+            os: deviceInfo.os,
+            version: deviceInfo.version,
+            phone_name: deviceInfo.phoneName,
+            sdk: deviceInfo.sdk,
+            model: deviceInfo.model,
+            model_marketing: deviceInfo.modelMarketing,
+            brand: deviceInfo.brand
+          }
+          try {
+            await deviceModel.saveDeviceV2(req.db, obj);
+          } catch (error) {
+            console.log('catch', error);
+          }
+          await loginModel.saveLog(req.db, deviceInfo.deviceId, 'SHORT_LOGIN');
+          let token: any = {
+            device_id: deviceInfo.deviceId,
+            cid: cid
+          };
+          data.token = jwt.sign(token);
+          data.ok = true;
+          res.send(data);
+        } else {
+          res.status(401)
+          res.send({ ok: false });
+        }
+      } else {
+        res.status(400)
+        res.send({ ok: false, error: 'ไม่พบ deviceId และ cid' });
+      }
+    } else {
+      res.status(401)
+      res.send({ ok: false })
+    }
+  } catch (error) {
+    console.log(error);
     res.status(HttpStatus.BAD_GATEWAY);
     res.send({ ok: false, error: error.message });
   }
