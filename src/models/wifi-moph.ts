@@ -9,16 +9,16 @@ export class WifiMophModel {
   }
 
 
-  findMacAddress(db: any, deviceId: any) {
+  findMacAddress(db: any, cid: any) {
     return db('device_wifi_moph')
-      .where({ 'device_id': deviceId })
+      .where({ 'cid': cid })
       .where('is_deleted', 'N');
   }
 
-  removeMacAddress(db: any, deviceId) {
+  removeMacAddress(db: any, cid) {
     return db('device_wifi_moph')
       .update({ 'is_deleted': 'Y' })
-      .where({ 'device_id': deviceId });
+      .where({ 'cid': cid });
   }
 
 }
