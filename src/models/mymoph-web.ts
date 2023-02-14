@@ -42,6 +42,14 @@ export class MyMophWebModel {
     })
   }
 
+  getAdvertiseById(db: any, id) {
+    return db.select('*').from('advertise').where('id', id);
+  }
+
+  getAdvertiseList(db: any){
+    return db.select('*').from('advertise');
+  }
+
 
 }
 

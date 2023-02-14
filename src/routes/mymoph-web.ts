@@ -33,6 +33,23 @@ router.get('/advertise/image/:imagename', async (req: Request, res: Response) =>
     res.send({ ok: false, rows: [] });
   }
 });
+router.get('/db/advertise/all', async (req: Request, res: Response) => {
+  try {
+    const rs: any = await myMophWebModel.getAdvertiseList(req.db);
+    res.send({ ok: true, rows: rs });
+  } catch (error) {
+    res.send({ ok: false, rows: [] });
+  }
+});
+router.get('/db/advertise/by_id/:id', async (req: Request, res: Response) => {
+  try {
+    const id = req.params['id'];
+    const rs: any = await myMophWebModel.getAdvertiseById(req.db,id);
+    res.send({ ok: true, rows: rs[0] });
+  } catch (error) {
+    res.send({ ok: false, rows: [] });
+  }
+});
 
 
 export default router;
