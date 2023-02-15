@@ -21,6 +21,14 @@ router.post('/', async (req: Request, res: Response) => {
     const macAddress = req.body.macAddress;
     const deviceId = req.body.deviceId;
     const cid = req.decoded.cid;
+    const firewall = [{
+      ip: '203.157.4.35',
+      vdom: 'ICT',
+    }, {
+      ip: '203.157.4.35',
+      vdom: 'Wireless',
+    }];
+
     if (deviceId && macAddress) {
       const info = await wifiMophModel.findMacAddress(db, cid);
       if (info.length == 1 && info[0].mac_address == macAddress) {
@@ -29,12 +37,13 @@ router.post('/', async (req: Request, res: Response) => {
         if (info.length) {
           await wifiMophModel.removeMacAddress(db, cid);
         }
-        for (const i of process.env.FIREWALL_IP.split(',')) {
+        for (const i of firewall) {
           const obj = {
             'device_id': deviceId,
             'mac_address': macAddress,
-            'firewall_url': `${i}`,
-            cid: cid
+            'firewall_url': i.ip,
+            'vdom': i.vdom,
+            'cid': cid
           }
           await wifiMophModel.saveMacAddress(db, obj);
         }
