@@ -1,238 +1,46 @@
-import { DeviceModel } from './../models/devices';
-/// <reference path="../../typings.d.ts" />
-
+import { RegisterModel } from '../models/register';
 import * as express from 'express';
 import { Router, Request, Response } from 'express';
-import * as HttpStatus from 'http-status-codes';
-import * as crypto from 'crypto';
-
-import { LoginModel } from '../models/login';
-
 import { Jwt } from '../models/jwt';
+var routeCache = require('route-cache');
+import * as moment from 'moment';
+import * as HttpStatus from 'http-status-codes';
+import e = require('express');
+var generator = require('generate-password');
 
-const deviceModel = new DeviceModel();
-const loginModel = new LoginModel();
+
 const jwt = new Jwt();
-
+const registerModel = new RegisterModel();
 const router: Router = Router();
 
 router.post('/', async (req: Request, res: Response) => {
-  try {
-    let username: string = req.body.username;
-    let password: string = req.body.password;
-    let deviceInfo: any = req.body.deviceInfo;
-    // let data: any = {};
-    let rs: any = await loginModel.login(username, password);
-    // console.log(rs.access_token);
-
-    if (rs.access_token) {
-
-
-      if (deviceInfo.deviceId) {
-        const obj: any = {
-          device_id: deviceInfo.deviceId,
-          cid: rs.cid,
-          fcm_token: deviceInfo.fcmToken,
-          system_name: deviceInfo.systemName,
-          version: deviceInfo.version,
-          model: deviceInfo.model,
-          model_version: deviceInfo.modelVersion
+  const { username, password } = req.body;
+  const rs: any = await registerModel.login(username, password);
+  if (rs.statusCode == 200) {
+    const profile = await registerModel.getProfile(rs.body.access_token);
+    if (profile.statusCode == 200) {
+      if (profile.body.is_kyc == 'Y') {
+        const data = {
+          cid: profile.body.cid,
+          is_kyc: profile.body.cid
         }
-        await deviceModel.saveDevice(req.db, obj);
-        await loginModel.saveLog(req.db, deviceInfo.deviceId, 'LONG_LOGIN');
-        let token: any = {
-          device_id: deviceInfo.deviceId,
-          cid: rs.cid
-        }
-        res.send({
-          ok: true,
-          token: jwt.sign(token),
-          oauth: {
-            access_token: rs.access_token,
-            cid: rs.cid,
-            refresh_token: rs.refresh_token,
-            expires_in: rs.expires_in
-          }
-        });
-      } else {
-        res.status(500)
-        res.send({ ok: false, error: rs.error, message: 'device not found' });
+        const token = await jwt.sign(data);
+        res.send({ token: token });
+      }else{
+        res.status(401);
+        res.send();
       }
-    } else {
-      res.status(401)
-      res.send({ ok: false, error: rs.error, message: rs.message });
+    }else{
+      res.status(profile.statusCode);
+      res.send(profile.body);
     }
-  } catch (error) {
-    console.log(error);
-
-    res.status(HttpStatus.BAD_GATEWAY);
-    res.send({ ok: false, error: error.message });
-  }
-});
-router.post('/v2', async (req: Request, res: Response) => {
-  try {
-    let username: string = req.body.username;
-    let password: string = req.body.password;
-    let deviceInfo: any = req.body.deviceInfo;
-    // let data: any = {};
-    let rs: any = await loginModel.login(username, password);
-    if (rs.statusCode == 200) {
-      if (rs.body.access_token) {
-        if (deviceInfo.deviceId) {
-          const obj: any = {
-            device_id: deviceInfo.deviceId,
-            cid: rs.body.cid,
-            fcm_token: deviceInfo.fcmToken,
-            os: deviceInfo.os,
-            version: deviceInfo.version,
-            phone_name: deviceInfo.phoneName,
-            sdk: deviceInfo.sdk,
-            model: deviceInfo.model,
-            model_marketing: deviceInfo.modelMarketing,
-            brand: deviceInfo.brand,
-            is_tablet: deviceInfo.isTaplet || 'N',
-            is_mobile: deviceInfo.isMobile || 'N',
-            app_version: deviceInfo.appVersion || null,
-          }
-          await deviceModel.saveDeviceV2(req.db, obj);
-          await loginModel.saveLog(req.db, deviceInfo.deviceId, 'LONG_LOGIN');
-          let token: any = {
-            device_id: deviceInfo.deviceId,
-            cid: rs.body.cid
-          }
-          res.send({
-            ok: true,
-            token: jwt.sign(token),
-            oauth: {
-              access_token: rs.body.access_token,
-              cid: rs.body.cid,
-              refresh_token: rs.body.refresh_token,
-              expires_in: rs.body.expires_in
-            }
-          });
-        } else {
-          res.status(500)
-          res.send({ ok: false, error: rs.error, message: 'device not found' });
-        }
-      } else {
-        res.status(401)
-        res.send({ ok: false, error: rs.error, message: rs.body.message });
-      }
-    } else {
-      res.status(rs.statusCode)
-      res.send({ ok: false, error: rs.error.error, message: rs.error.message });
-    }
-  } catch (error) {
-    res.status(502);
-    res.send({ ok: false, error: error.message });
+  }else{
+    res.status(rs.statusCode);
+    res.send(rs.body);
   }
 });
 
-router.post('/v3', async (req: Request, res: Response) => {
-  try {
-    let username: string = req.body.username;
-    let password: string = req.body.password;
-    let deviceInfo: any = req.body.deviceInfo;
-    // let data: any = {};
-    let rs: any = await loginModel.login(username, password);
-    if (rs.statusCode == 200) {
-      if (rs.body.access_token) {
-        if (deviceInfo.deviceId) {
-          const obj: any = {
-            device_id: deviceInfo.deviceId,
-            cid: rs.body.cid,
-            fcm_token: deviceInfo.fcmToken,
-            os: deviceInfo.os,
-            version: deviceInfo.version,
-            phone_name: deviceInfo.phoneName,
-            sdk: deviceInfo.sdk,
-            model: deviceInfo.model,
-            model_marketing: deviceInfo.modelMarketing,
-            brand: deviceInfo.brand,
-            is_tablet: deviceInfo.isTaplet || 'N',
-            is_mobile: deviceInfo.isMobile || 'N',
-            app_version: deviceInfo.appVersion || null,
-          }
-          await deviceModel.changeStatusWithoutDeviceId(req.db, rs.body.cid, deviceInfo.deviceId);
-          await deviceModel.saveDeviceV2(req.db, obj);
-          await loginModel.saveLog(req.db, deviceInfo.deviceId, 'LONG_LOGIN');
-          let token: any = {
-            device_id: deviceInfo.deviceId,
-            cid: rs.body.cid
-          }
-          res.send({
-            ok: true,
-            token: jwt.sign(token),
-            oauth: {
-              access_token: rs.body.access_token,
-              cid: rs.body.cid,
-              refresh_token: rs.body.refresh_token,
-              expires_in: rs.body.expires_in
-            }
-          });
-        } else {
-          res.status(500)
-          res.send({ ok: false, error: rs.error, message: 'device not found' });
-        }
-      } else {
-        res.status(401)
-        res.send({ ok: false, error: rs.error, message: rs.body.message });
-      }
-    } else {
-      res.status(rs.statusCode)
-      res.send({ ok: false, error: rs.error.error, message: rs.error.message });
-    }
-  } catch (error) {
-    res.status(502);
-    res.send({ ok: false, error: error.message });
-  }
-});
 
-// mymoph://qr?clientId=xxxxx&token=xxxxx&sessionId=xxx
-router.post('/qr', async (req: Request, res: Response) => {
-  try {
-    let clientId: string = req.body.clientId;
-    let refreshToken: string = req.body.refreshToken;
-    let accessToken: string = req.body.accessToken;
-    let sessionId: string = req.body.sessionId;
-    console.log(req.body);
 
-    let rs: any = await loginModel.loginQR(clientId, sessionId, refreshToken, accessToken);
-    console.log(rs);
-    if (rs) {
-      if (rs.message == "OK") {
-        rs.ok = true;
-        res.send(rs);
-      } else {
-        rs.ok = false;
-        res.send(rs);
-      }
-    } else {
-      res.status(401)
-      res.send({ ok: false, error: rs.error, message: rs.message });
-    }
-  } catch (error) {
-    res.status(HttpStatus.BAD_GATEWAY);
-    res.send({ ok: false, error: error.message });
-  }
-});
-
-router.post('/token', async (req: Request, res: Response) => {
-  try {
-    let refreshToken: string = req.body.refreshToken;
-    let rs: any = await loginModel.refreshToken(refreshToken);
-
-    if (rs.access_token) {
-      rs.ok = true;
-      res.send(rs);
-    } else {
-      res.status(401)
-      res.send({ ok: false, error: rs.error, message: rs.message });
-    }
-  } catch (error) {
-    res.status(HttpStatus.BAD_GATEWAY);
-    res.send({ ok: false, error: error.message });
-  }
-});
 
 export default router;

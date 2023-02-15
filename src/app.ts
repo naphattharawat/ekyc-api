@@ -10,27 +10,18 @@ import * as ejs from 'ejs';
 import * as HttpStatus from 'http-status-codes';
 import * as express from 'express';
 import * as cors from 'cors';
-
+import * as moment from 'moment';
+import * as fs from 'fs';
 // import Knex = require('knex');
 import { Router, Request, Response, NextFunction } from 'express';
 import { Jwt } from './models/jwt';
 
-import indexRoute from './routes/index';
-import mymophWebRoute from './routes/mymoph-web';
 import loginRoute from './routes/login';
-import logoutRoute from './routes/logout';
-import loginAuthRoute from './routes/login_auth';
-import devicesRoute from './routes/device';
-import profilesRoute from './routes/profile';
-import sessionsRoute from './routes/sessions';
-import payslipRoute from './routes/payslip';
-import hrRoute from './routes/hr';
 import registerRoute from './routes/register';
-import wifiMophRoute from './routes/wifi-moph';
 
 // Assign router to the express.Router() instance
 const app: express.Application = express();
-var mqtt = require('mqtt')
+
 const jwt = new Jwt();
 
 //view engine setup
@@ -76,48 +67,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   req.db = db;
   next();
 });
-app.use((req: Request, res: Response, next: NextFunction) => {
-
-  const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
-  var client = mqtt.connect('mqtt://mqtt-mymoph.moph.go.th',
-    {
-      clientId: clientId,
-      username: process.env.MQTT_USERNAME,
-      password: process.env.MQTT_PASSWORD
-    });
-
-  client.on('connect', function () {
-    // client.subscribe('mymoph/test', function (err) {
-    // if (!err) {
-    //   client.publish('presence', 'Hello mqtt')
-    // }
-    // })
-  })
-  client.on('connected', function () {
-    console.log('connected');
-  })
-  client.on('disconnect', function () {
-    console.log('disconnect');
-  })
-
-  client.on('message', function (topic, message) {
-    // message is Buffer
-    console.log(message.toString())
-    client.end()
-  })
-  req.mqttClient = client;
-  next();
-});
 
 let checkAuth = (req: Request, res: Response, next: NextFunction) => {
   let token: any = null;
 
   if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
     token = req.headers.authorization.split(' ')[1];
-  } else if (req.query && req.query.token) {
-    token = req.query.token;
-  } else {
-    token = req.body.token;
   }
 
   jwt.verify(token)
@@ -125,6 +80,8 @@ let checkAuth = (req: Request, res: Response, next: NextFunction) => {
       req.decoded = decoded;
       next();
     }, err => {
+      saveLog('??', '0000000000000', 401, req.originalUrl, 'UNAUTHORIZED');
+      res.status(401);
       return res.send({
         ok: false,
         error: HttpStatus.getStatusText(HttpStatus.UNAUTHORIZED),
@@ -133,22 +90,17 @@ let checkAuth = (req: Request, res: Response, next: NextFunction) => {
     });
 }
 
-
-
+async function saveLog(method, cid, status, url, error) {
+  const text = `${moment().format('DD-MM-YYYY HH:mm:ss')}\t[${method}]\t${cid}\t${status}\t${url}\t${error}\n`;
+  const pathFile = path.join(process.env.PATH_LOG, 'api.log');
+  fs.appendFile(pathFile, text, function (err) {
+    if (err) throw err;
+    // console.log('Saved!');
+  });
+}
 
 app.use('/login', loginRoute);
-app.use('/logout', checkAuth, logoutRoute);
-app.use('/login/bio', checkAuth, loginAuthRoute);
-app.use('/login/auth', checkAuth, loginAuthRoute);
-app.use('/devices', checkAuth, devicesRoute);
-app.use('/profiles', checkAuth, profilesRoute);
-app.use('/sessions', checkAuth, sessionsRoute);
-app.use('/payslips', checkAuth, payslipRoute);
-app.use('/hr', checkAuth, hrRoute);
-app.use('/wifi-moph', checkAuth, wifiMophRoute);
-app.use('/register', registerRoute);
-app.use('/web/api', mymophWebRoute);
-app.use('/', indexRoute);
+app.use('/', checkAuth, registerRoute);
 
 //error handlers
 

@@ -5,7 +5,7 @@ export class Jwt {
 
   sign(playload: any) {
     let token = jwt.sign(playload, this.secretKey, {
-      expiresIn: '365d'
+      expiresIn: '1d'
     });
     return token;
   }
