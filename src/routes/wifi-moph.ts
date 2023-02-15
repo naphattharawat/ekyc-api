@@ -26,11 +26,11 @@ router.post('/', async (req: Request, res: Response) => {
       if (info.length) {
         await wifiMophModel.removeMacAddress(db, cid);
       }
-      for (const i of process.env.FIREWALL_URL.split(',')) {
+      for (const i of process.env.FIREWALL_IP.split(',')) {
         const obj = {
           'device_id': deviceId,
           'mac_address': macAddress,
-          'firewall_url': `${i}/api/v2/cmdb/firewall/address`,
+          'firewall_url': `${i}`,
           cid: cid
         }
         await wifiMophModel.saveMacAddress(db, obj);
