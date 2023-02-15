@@ -23,19 +23,23 @@ router.post('/', async (req: Request, res: Response) => {
     const cid = req.decoded.cid;
     if (deviceId && macAddress) {
       const info = await wifiMophModel.findMacAddress(db, cid);
-      if (info.length) {
-        await wifiMophModel.removeMacAddress(db, cid);
-      }
-      for (const i of process.env.FIREWALL_IP.split(',')) {
-        const obj = {
-          'device_id': deviceId,
-          'mac_address': macAddress,
-          'firewall_url': `${i}`,
-          cid: cid
+      if (info.length == 1 && info[0].mac_address == macAddress) {
+        res.send({ ok: true });
+      } else {
+        if (info.length) {
+          await wifiMophModel.removeMacAddress(db, cid);
         }
-        await wifiMophModel.saveMacAddress(db, obj);
+        for (const i of process.env.FIREWALL_IP.split(',')) {
+          const obj = {
+            'device_id': deviceId,
+            'mac_address': macAddress,
+            'firewall_url': `${i}`,
+            cid: cid
+          }
+          await wifiMophModel.saveMacAddress(db, obj);
+        }
+        res.send({ ok: true });
       }
-      res.send({ ok: true });
     } else {
       res.send({ ok: false, error: 'Parameter not found' });
     }
