@@ -91,23 +91,23 @@ router.post('/MobileIdService/api/v2/Sessions/:sessionId/Documents', upload.any(
   }
 });
 
-router.post('/MobileIdService/api/v2/Sessions/:sessionId/manaual-selfie', upload.any(), async (req: Request, res: Response) => {
+router.post('/MobileIdService/api/v2/Sessions/:sessionId/manual-selfie', upload.any(), async (req: Request, res: Response) => {
   const sessionId = req.params.sessionId;
   const documentType = req.body.documentType;
   try {
     if (req.files.length) {
       const filePath = req.files[0].path || null;
       const rs: any = await registerModel.ekycManaual(sessionId, filePath, documentType);
-      saveLog('POST', req.decoded.cid, rs.statusCode, `/MobileIdService/api/v2/Sessions/${sessionId}/manaual-selfie`, '');
+      saveLog('POST', req.decoded.cid, rs.statusCode, `/MobileIdService/api/v2/Sessions/${sessionId}/manual-selfie`, '');
       res.status(rs.statusCode);
       res.send(rs.body);
     } else {
-      saveLog('POST', req.decoded.cid, HttpStatus.BAD_REQUEST, `/MobileIdService/api/v2/Sessions/${sessionId}/manaual-selfie`, 'Image not found');
+      saveLog('POST', req.decoded.cid, HttpStatus.BAD_REQUEST, `/MobileIdService/api/v2/Sessions/${sessionId}/manual-selfie`, 'Image not found');
       res.status(HttpStatus.BAD_REQUEST);
       res.send({ ok: false })
     }
   } catch (error) {
-    saveLog('POST', req.decoded.cid, HttpStatus.BAD_GATEWAY, `/MobileIdService/api/v2/Sessions/${sessionId}/manaual-selfie`, error.message);
+    saveLog('POST', req.decoded.cid, HttpStatus.BAD_GATEWAY, `/MobileIdService/api/v2/Sessions/${sessionId}/manual-selfie`, error.message);
     res.status(HttpStatus.BAD_GATEWAY);
     res.send({ ok: false, error: error.message, code: HttpStatus.BAD_GATEWAY });
   }
