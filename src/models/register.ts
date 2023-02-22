@@ -52,7 +52,7 @@ export class RegisterModel {
     const key = process.env.ekyc_appId;
     const options = {
       method: 'POST',
-      url: `https://rmsservice.moph.go.th/MobileIdService/api/v2/Sessions/${sessionId}/manual-selfie`,
+      url: `https://rmsservice.moph.go.th/MobileIdService/api/v2/Sessions/${sessionId}/manaual-selfie`,
       headers: {
         apiKey: key,
         'Content-Type': 'multipart/form-data'
