@@ -18,6 +18,7 @@ import { Jwt } from './models/jwt';
 
 import loginRoute from './routes/login';
 import registerRoute from './routes/register';
+import publicRoute from './routes/public';
 
 // Assign router to the express.Router() instance
 const app: express.Application = express();
@@ -100,6 +101,7 @@ async function saveLog(method, cid, status, url, error) {
 }
 
 app.use('/login', loginRoute);
+app.use('/public', publicRoute);
 app.use('/', checkAuth, registerRoute);
 
 //error handlers
